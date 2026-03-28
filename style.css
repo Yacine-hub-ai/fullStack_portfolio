@@ -99,6 +99,7 @@ body {
     gap: 100px;
     list-style: none;
     padding: 0;
+    justify-content: center;
   }
   .content ul li a {
     text-decoration: none;
@@ -108,4 +109,14 @@ body {
   
   .content ul li a:hover {
     color: #007BFF;
+  }
+
+  .header-left {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .nom {
+    font-size: 18px;
+    font-weight: bold;
   }
