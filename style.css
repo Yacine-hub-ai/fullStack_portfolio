@@ -21,6 +21,7 @@ body {
   
   nav a:hover {
     text-decoration: underline;
+    color: #007BFF;
   }
   .container {
     padding: 20px;
