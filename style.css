@@ -94,3 +94,18 @@ body {
   .im{
     width: 150px;
   }
+  .content ul {
+    display: flex;
+    gap: 100px;
+    list-style: none;
+    padding: 0;
+  }
+  .content ul li a {
+    text-decoration: none;
+    color: black;
+    font-weight: bold;
+  }
+  
+  .content ul li a:hover {
+    color: #007BFF;
+  }
