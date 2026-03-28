@@ -85,3 +85,7 @@ body {
     border-radius: 50%;
     object-fit: cover;
   }
+
+  .nav-menu a {
+    margin-left: 15px;
+  }
