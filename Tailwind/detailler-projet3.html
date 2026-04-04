@@ -5,26 +5,25 @@
         <title>Détail des projet</title>
         <link rel="stylesheet" href="style.css">
     </head>
-    <body>
+    <body class="bg-gray-100">
 
-        <header>
-            <h1>Détail du projet</h1>
-            <nav>
-                <a href="lister-projets.html">Retour à la liste</a>
-                <a href="index.html">Accueil</a>
+        <header class="flex justify-between items-center bg-gray-900 text-white p-4">
+            <h1 class="text-xl font-bold">Détail du projet</h1>
+            <nav class="flex gap-6">
+               <!-- <a href="lister-projets.html">Retour à la liste</a>-->
+                <a href="index.html" class="hover:text-blue-400 transition">Accueil</a>
             </nav>
         </header>
         <main class="container">
-            <img src="/Users/yacine/Documents/ODC/Demo_HTML_CSS/images.jpeg" alt="mobile">
-            <h2>Libellé: Application mobile</h2>
+            <img src="ubuntu-serveur-lts.webp" alt="mobile">
+            <h2>Libellé: Serveur Linux</h2>
             <p><strong>Description: </strong></p>
-
-            <p>Une application mobile (ou « app ») est un logiciel applicatif conçu pour être installé et exécuté sur un appareil électronique mobile, tel qu'un smartphone ou une tablette. Téléchargeables depuis des plateformes comme l'App Store ou Google Play, elles offrent des fonctionnalités spécifiques (jeux, services, outils) adaptées à une utilisation mobile</p>
-            <h3>Technologies utilisées :</h3>
+            <p>Un serveur Linux est un ordinateur (physique ou virtuel) qui utilise une version du système d'exploitation Linux pour fournir des services, des données ou des ressources à d'autres ordinateurs sur un réseau.</p>          
+            <h3>Technologies utilisées : Les technologies d'un serveur Linux s'organisent en couches, allant du matériel aux applications finales. En 2026, l'accent est mis sur l'automatisation, la conteneurisation et la sécurité renforcée</h3>
              <ol>
-              <li>HTML</li>
-              <li>CSS</li>
-              <li>Flutter</li>
+              <li>Gestion à distance (SSH) : Le protocole standard pour administrer un serveur via un terminal sécurisé.</li>
+              <li>Interfaces Web (Panels) : Des outils comme Cockpit ou Webmin permettent une gestion graphique simplifiée (réseau, disques, services).</li>
+              <li>Automatisation (Infrastructure as Code) : Ansible, Puppet ou Chef sont utilisés pour configurer des dizaines de serveurs simultanément via des scripts</li>
              </ol>
              <a href="lister-projets.html">← Retour à la liste des projets</a>
         </main>
