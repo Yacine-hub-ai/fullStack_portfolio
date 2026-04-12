@@ -18,3 +18,9 @@ function ajouterProjet(libelle, image) {
   
     updateCount();
   }
+
+  function supprimerProjet(id, element) {
+    projets = projets.filter(p => p.id !== id);
+    element.remove();
+    updateCount();
+  }
