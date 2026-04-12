@@ -24,3 +24,14 @@ function ajouterProjet(libelle, image) {
     element.remove();
     updateCount();
   }
+
+  form.addEventListener("submit", (e) => {
+    e.preventDefault();
+  
+    ajouterProjet(
+      libelle.value,
+      "https://via.placeholder.com/400"
+    );
+  
+    form.reset();
+  });
