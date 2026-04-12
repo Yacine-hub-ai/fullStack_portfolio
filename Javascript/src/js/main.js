@@ -50,3 +50,10 @@ function ajouterProjet(libelle, image) {
   
     form.reset();
   });
+
+  fetch("http://localhost:3000/projets")
+  .then(res => res.json())
+  .then(data => {
+    projets = data;
+    projets.forEach(p => creerProjet(p.id, p.libelle, p.image));
+  });
