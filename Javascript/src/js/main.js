@@ -39,3 +39,14 @@ function ajouterProjet(libelle, image) {
   function updateCount() {
     compteur.textContent = `${projets.length} projets`;
   }
+
+  form.addEventListener("submit", (e) => {
+    e.preventDefault();
+  
+    ajouterProjet(
+      libelle.value,
+      "https://via.placeholder.com/400"
+    );
+  
+    form.reset();
+  });
