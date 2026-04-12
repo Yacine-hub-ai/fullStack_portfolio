@@ -5,3 +5,16 @@ const form = document.getElementById("formulaireProjet");
 const compteur = document.getElementById("compteurProjets");
 
 let projets = [];
+
+function ajouterProjet(libelle, image) {
+    const projet = {
+      id: Date.now(),
+      libelle,
+      image
+    };
+  
+    projets.push(projet);
+    creerProjet(projet.id, projet.libelle, projet.image);
+  
+    updateCount();
+  }
