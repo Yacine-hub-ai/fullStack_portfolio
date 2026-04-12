@@ -35,3 +35,7 @@ function ajouterProjet(libelle, image) {
   
     form.reset();
   });
+
+  function updateCount() {
+    compteur.textContent = `${projets.length} projets`;
+  }
