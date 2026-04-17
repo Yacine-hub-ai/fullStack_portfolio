@@ -1,0 +1,119 @@
+<!doctype html>
+<html lang="fr">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Portfolio JS SPA</title>
+
+  <!-- Tailwind -->
+  <link rel="stylesheet" href="./src/output.css" />
+</head>
+
+<body class="bg-gray-950 text-white font-mono antialiased overflow-x-hidden">
+
+<!-- ═════════════════════════════════ HEADER -->
+<header class="fixed top-0 left-0 right-0 z-40 bg-gray-900/80 backdrop-blur border-b border-gray-800">
+
+  <nav class="max-w-7xl mx-auto flex items-center justify-between px-6 py-4">
+
+    <!-- Logo -->
+    <a href="yass1.jpeg" class="flex items-center gap-2 font-bold text-lg">
+      <span class="w-7 h-7 bg-blue-500 rounded-md flex items-center justify-center text-xs font-black">
+        JS
+      </span>
+      Portfolio SPA
+    </a>
+
+    <!-- Links -->
+    <ul class="hidden md:flex items-center gap-8 text-sm text-gray-300">
+      <li><a href="#projets" class="hover:text-blue-400">Projets</a></li>
+      <li><a href="#section-formulaire" class="hover:text-blue-400">Ajouter</a></li>
+    </ul>
+
+  </nav>
+
+</header>
+
+<!-- ═════════════════════════════════ MAIN -->
+<main class="pt-24">
+
+<!-- ================= PROJETS -->
+<section id="projets" class="py-16 px-6 max-w-7xl mx-auto">
+
+  <div class="flex justify-between items-center mb-10">
+    <h2 class="text-3xl font-bold">Mes Projets</h2>
+    <span id="compteurProjets" class="text-sm text-gray-400"></span>
+  </div>
+
+  <div id="conteneur-projets"
+       class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+  </div>
+
+</section>
+
+<!-- ================= FORMULAIRE -->
+<section id="section-formulaire" class="py-16 px-6 max-w-2xl mx-auto">
+
+  <div class="bg-gray-900 border border-gray-800 rounded-2xl p-6">
+
+    <h2 class="text-xl font-bold mb-6">Ajouter un projet</h2>
+
+    <form id="formulaireProjet" class="flex flex-col gap-4">
+
+      <input id="libelle" placeholder="Libellé"
+        class="bg-gray-800 p-3 rounded border border-gray-700" required />
+
+      <textarea id="description" placeholder="Description"
+        class="bg-gray-800 p-3 rounded border border-gray-700"></textarea>
+
+      <input id="technologies" placeholder="Technologies"
+        class="bg-gray-800 p-3 rounded border border-gray-700" />
+
+      <input id="githubUrl" placeholder="GitHub URL"
+        class="bg-gray-800 p-3 rounded border border-gray-700" />
+
+      <input id="demoUrl" placeholder="Demo URL"
+        class="bg-gray-800 p-3 rounded border border-gray-700" />
+
+      <select id="statut"
+        class="bg-gray-800 p-3 rounded border border-gray-700">
+        <option value="en_cours">En cours</option>
+        <option value="termine">Terminé</option>
+        <option value="archive">Archivé</option>
+      </select>
+
+      <button class="bg-blue-500 hover:bg-blue-600 py-3 rounded font-bold">
+        + Ajouter projet
+      </button>
+
+    </form>
+
+  </div>
+
+</section>
+
+<!-- ================= DETAIL MODAL -->
+<section id="section-detail"
+  class="hidden fixed inset-0 bg-black/70 flex items-center justify-center">
+
+  <div class="bg-gray-900 border border-gray-700 p-6 rounded-xl w-full max-w-lg relative">
+
+    <button id="btnFermerDetail"
+      class="absolute top-2 right-3 text-xl text-gray-400 hover:text-white">
+      ✕
+    </button>
+
+    <div id="detail-contenu"></div>
+
+  </div>
+
+</section>
+
+</main>
+
+<!-- ═════════════════════════════════ JS -->
+<script type="module" src="./src/main.js"></script>
+
+</body>
+</html>

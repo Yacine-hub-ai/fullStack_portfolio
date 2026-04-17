@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Liste des projets</title>
+    <link rel="stylesheet" href="./src/output.css">
+</head>
+<body class="bg-gray-100">
+    <header class="flex justify-between items-center bg-gray-900 text-white p-4">
+        <h1 class="text-xl font-bold">Liste des projets</h1>
+        <nav class="flex gap-6">
+            <a href="index.html" class="hover:text-blue-400 transition">Accueil</a>
+            <a href="ajouter-projet.html" class="hover:text-blue-400 transition">Ajouter</a>
+        </nav>
+    </header>
+    <main class="max-w-6xl mx-auto p-6 grid md:grid-cols-3 gap-6">
+        <div class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-xl transition">
+            <a href="detailler-projet.html">
+              <h2 class="text-lg font-bold mb-2 hover:text-blue-500">Gestion des versions avec git</h2>
+            </a>
+            <img src="AXOPEN_Blog_Git_gestion_version_d1778146a4.jpg" class="w-full h-40 object-cover" alt="git">
+            <button class="btn-supp" class="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600 transition">Supprimer</button>
+          </div>
+
+          <div class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-xl transition">
+            <a href="detailler-projet2.html">
+              <h2 class="text-lg font-bold mb-2 hover:text-blue-500">Routage</h2>
+            </a>
+            <img src="image-1.png" class="w-full h-40 object-cover" alt="site e-commerce">
+            <button class="btn-supp" class="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600 transition">Supprimer</button>
+          </div>
+          <div class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-xl transition">
+            <a href="detailler-projet3.html">
+              <h2 class="text-lg font-bold mb-2 hover:text-blue-500">Application cross-platform</h2>
+            </a>
+            <img src="ubuntu-serveur-lts.webp" class="w-full h-40 object-cover" alt="App">
+            <button class="btn-supp" class="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600 transition">Supprimer</button>
+          </div>
+
+    </main>
+    <footer class="bg-gray-900 text-white text-center p-4 mt-6">
+        <p>&copy; 2026 Fullstack Portfolio</p>
+      </footer>
+</body>
+</html>

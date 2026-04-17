@@ -1,0 +1,122 @@
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f4f4f4;
+  }
+  header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 20px;
+    
+  }
+
+  nav a {
+    color: black;
+    margin: 0 10px;
+    text-decoration: none;
+    font-weight: bold;
+  }
+  
+  nav a:hover {
+    text-decoration: underline;
+    color: #007BFF;
+  }
+  .container {
+    padding: 20px;
+  }
+
+  .project {
+    background: white;
+    padding: 15px;
+    margin-bottom: 15px;
+    border-radius: 8px;
+  }
+  
+  .project img {
+    width: 200px;
+    border-radius: 5px;
+  }
+  
+  .project h2 {
+    margin-top: 10px;
+  }
+  button {
+    background-color: red;
+    color: white;
+    border: none;
+    padding: 8px 12px;
+    cursor: pointer;
+    margin-top: 10px;
+  }
+  
+  button:hover {
+    background-color: darkred;
+  }
+
+  form {
+    background: white;
+    padding: 20px;
+    border-radius: 8px;
+  }
+
+  input, textarea {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 10px;
+  }
+
+  footer {
+    background-color: #333;
+    color: white;
+    text-align: center;
+    padding: 10px;
+    margin-top: 20px;
+  }
+
+  .project:hover {
+    transform: scale(1.02);
+    transition: 0.3s;
+  }
+
+  .logo {
+    width: 80px;
+    height: auto;
+    border-radius: 50%;
+    object-fit: cover;
+  }
+
+  .nav-menu a {
+    margin-left: 15px;
+    color: black;
+  }
+  .im{
+    width: 150px;
+  }
+  .content ul {
+    display: flex;
+    gap: 100px;
+    list-style: none;
+    padding: 0;
+    justify-content: center;
+  }
+  .content ul li a {
+    text-decoration: none;
+    color: black;
+    font-weight: bold;
+  }
+  
+  .content ul li a:hover {
+    color: #007BFF;
+  }
+
+  .header-left {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .nom {
+    font-size: 18px;
+    font-weight: bold;
+  }

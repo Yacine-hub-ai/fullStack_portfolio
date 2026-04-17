@@ -1,0 +1,59 @@
+import "src/output.css"
+
+const conteneur = document.getElementById("conteneur-projets");
+const form = document.getElementById("formulaireProjet");
+const compteur = document.getElementById("compteurProjets");
+
+let projets = [];
+
+function ajouterProjet(libelle, image) {
+    const projet = {
+      id: Date.now(),
+      libelle,
+      image
+    };
+  
+    projets.push(projet);
+    creerProjet(projet.id, projet.libelle, projet.image);
+  
+    updateCount();
+  }
+
+  function supprimerProjet(id, element) {
+    projets = projets.filter(p => p.id !== id);
+    element.remove();
+    updateCount();
+  }
+
+  form.addEventListener("submit", (e) => {
+    e.preventDefault();
+  
+    ajouterProjet(
+      libelle.value,
+      "https://via.placeholder.com/400"
+    );
+  
+    form.reset();
+  });
+
+  function updateCount() {
+    compteur.textContent = `${projets.length} projets`;
+  }
+
+  form.addEventListener("submit", (e) => {
+    e.preventDefault();
+  
+    ajouterProjet(
+      libelle.value,
+      "https://via.placeholder.com/400"
+    );
+  
+    form.reset();
+  });
+
+  fetch("http://localhost:3000/projets")
+  .then(res => res.json())
+  .then(data => {
+    projets = data;
+    projets.forEach(p => creerProjet(p.id, p.libelle, p.image));
+  });
