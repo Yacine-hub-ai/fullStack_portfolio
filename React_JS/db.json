@@ -1,0 +1,25 @@
+{
+  "projets": [
+    {
+      "id": 1,
+      "libelle": "Gestion de version avec Git",
+      "description": "La gestion des versions avec Git permet de suivre, d'enregistrer et de gérer les modifications apportées aux fichiers d'un projet au fil du temps.",
+      "image": "",
+      "technologies": "Git, Terminal, GitHub"
+    },
+    {
+      "id": 2,
+      "libelle": "Routage réseau",
+      "description": "Le routage est le processus par lequel un routeur sélectionne le meilleur chemin pour acheminer des paquets de données d'un point A vers un point B à travers différents réseaux interconnectés.",
+      "image": "",
+      "technologies": "OSPF, BGP, EIGRP, Dijkstra"
+    },
+    {
+      "id": 3,
+      "libelle": "Serveur Linux Ubuntu",
+      "description": "Un serveur Linux est un ordinateur (physique ou virtuel) qui utilise Linux pour fournir des services, des données ou des ressources à d'autres ordinateurs sur un réseau.",
+      "image": "",
+      "technologies": "Ubuntu, SSH, Ansible, Cockpit"
+    }
+  ]
+}
