@@ -1,119 +1,417 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="fr">
-
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Portfolio JS SPA</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mame Yacine Ndiaye — Portfolio</title>
 
-  <!-- Tailwind -->
-  <link rel="stylesheet" href="./src/output.css" />
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+
+  <style>
+    /* Polices personnalisées */
+    body { font-family: 'DM Sans', sans-serif; }
+    .font-display { font-family: 'Syne', sans-serif; }
+
+    /* Animation d'entrée de page */
+    .page { display: none; }
+    .page.active {
+      display: block;
+      animation: fadeUp 0.3s ease;
+    }
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(14px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Line-clamp pour les descriptions */
+    .line-clamp-2 {
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+  </style>
 </head>
 
-<body class="bg-gray-950 text-white font-mono antialiased overflow-x-hidden">
+<body class="bg-gray-100 min-h-screen">
 
-<!-- ═════════════════════════════════ HEADER -->
-<header class="fixed top-0 left-0 right-0 z-40 bg-gray-900/80 backdrop-blur border-b border-gray-800">
+<!-- ═══════════════════════════════════════════════════════════
+     HEADER — sticky, gris foncé
+═══════════════════════════════════════════════════════════════ -->
+<header class="sticky top-0 z-50 flex justify-between items-center bg-gray-900 text-white px-6 py-3 shadow-lg">
 
-  <nav class="max-w-7xl mx-auto flex items-center justify-between px-6 py-4">
+  <!-- Marque / Avatar -->
+  <div class="flex items-center gap-3">
+    <!-- Avatar photo (ou initiales en fallback) -->
+    <div class="relative w-10 h-10 rounded-full overflow-hidden flex-shrink-0 bg-blue-500 flex items-center justify-center">
+      <img
+        id="avatar-img"
+        src="yass1.jpeg"
+        alt="Mame Yacine"
+        class="w-full h-full object-cover hidden"
+      >
+      <span id="avatar-text" class="text-white font-bold text-sm">MY</span>
+    </div>
+    <span class="font-display font-bold text-base tracking-tight">Mame Yacine Ndiaye</span>
+  </div>
 
-    <!-- Logo -->
-    <a href="yass1.jpeg" class="flex items-center gap-2 font-bold text-lg">
-      <span class="w-7 h-7 bg-blue-500 rounded-md flex items-center justify-center text-xs font-black">
-        JS
-      </span>
-      Portfolio SPA
-    </a>
-
-    <!-- Links -->
-    <ul class="hidden md:flex items-center gap-8 text-sm text-gray-300">
-      <li><a href="#projets" class="hover:text-blue-400">Projets</a></li>
-      <li><a href="#section-formulaire" class="hover:text-blue-400">Ajouter</a></li>
-    </ul>
-
+  <!-- Navigation -->
+  <nav class="flex gap-1">
+    <button id="nav-accueil" onclick="showPage('accueil')"
+      class="text-gray-400 hover:text-white px-4 py-2 rounded-lg text-sm transition-colors">
+      Accueil
+    </button>
+    <button id="nav-projets" onclick="showPage('projets')"
+      class="text-gray-400 hover:text-white px-4 py-2 rounded-lg text-sm transition-colors">
+      Projets
+    </button>
+    <button id="nav-ajouter" onclick="showPage('ajouter')"
+      class="text-gray-400 hover:text-white px-4 py-2 rounded-lg text-sm transition-colors">
+      Ajouter
+    </button>
+    <button id="nav-contact" onclick="showPage('contact')"
+      class="text-gray-400 hover:text-white px-4 py-2 rounded-lg text-sm transition-colors">
+      Contact
+    </button>
   </nav>
-
 </header>
 
-<!-- ═════════════════════════════════ MAIN -->
-<main class="pt-24">
 
-<!-- ================= PROJETS -->
-<section id="projets" class="py-16 px-6 max-w-7xl mx-auto">
+<!-- ═══════════════════════════════════════════════════════════
+     PAGE — ACCUEIL
+═══════════════════════════════════════════════════════════════ -->
+<div class="page" id="page-accueil">
 
-  <div class="flex justify-between items-center mb-10">
-    <h2 class="text-3xl font-bold">Mes Projets</h2>
-    <span id="compteurProjets" class="text-sm text-gray-400"></span>
-  </div>
+  <!-- Hero -->
+  <section class="bg-white shadow text-center py-20 px-6">
+    <!-- Grande photo de profil -->
+    <div class="flex justify-center mb-6">
+      <div class="relative w-28 h-28 rounded-full overflow-hidden border-4 border-blue-400 shadow-md bg-blue-100 flex items-center justify-center">
+        <img
+          id="hero-photo"
+          src="yass1.jpeg"
+          alt="Mame Yacine Ndiaye"
+          class="w-full h-full object-cover"
+          onerror="this.style.display='none'; document.getElementById('hero-initials').style.display='flex'"
+        >
+        <div id="hero-initials" class="absolute inset-0 items-center justify-center bg-blue-500 text-white text-3xl font-bold hidden flex">
+          MY
+        </div>
+      </div>
+    </div>
 
-  <div id="conteneur-projets"
-       class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-  </div>
-
-</section>
-
-<!-- ================= FORMULAIRE -->
-<section id="section-formulaire" class="py-16 px-6 max-w-2xl mx-auto">
-
-  <div class="bg-gray-900 border border-gray-800 rounded-2xl p-6">
-
-    <h2 class="text-xl font-bold mb-6">Ajouter un projet</h2>
-
-    <form id="formulaireProjet" class="flex flex-col gap-4">
-
-      <input id="libelle" placeholder="Libellé"
-        class="bg-gray-800 p-3 rounded border border-gray-700" required />
-
-      <textarea id="description" placeholder="Description"
-        class="bg-gray-800 p-3 rounded border border-gray-700"></textarea>
-
-      <input id="technologies" placeholder="Technologies"
-        class="bg-gray-800 p-3 rounded border border-gray-700" />
-
-      <input id="githubUrl" placeholder="GitHub URL"
-        class="bg-gray-800 p-3 rounded border border-gray-700" />
-
-      <input id="demoUrl" placeholder="Demo URL"
-        class="bg-gray-800 p-3 rounded border border-gray-700" />
-
-      <select id="statut"
-        class="bg-gray-800 p-3 rounded border border-gray-700">
-        <option value="en_cours">En cours</option>
-        <option value="termine">Terminé</option>
-        <option value="archive">Archivé</option>
-      </select>
-
-      <button class="bg-blue-500 hover:bg-blue-600 py-3 rounded font-bold">
-        + Ajouter projet
+    <h1 class="font-display text-4xl font-extrabold text-gray-800 mb-3">
+      Bienvenue sur mon Portfolio
+    </h1>
+    <p class="text-gray-500 text-base leading-relaxed max-w-lg mx-auto mb-8">
+      Découvrez mes projets et compétences en développement web, mobile,
+      réseaux et administration système.
+    </p>
+    <div class="flex justify-center gap-3 flex-wrap">
+      <button onclick="showPage('projets')"
+        class="bg-blue-500 hover:bg-blue-600 text-white px-6 py-2.5 rounded-lg text-sm font-medium transition-colors shadow">
+        Voir mes projets →
       </button>
+      <button onclick="showPage('contact')"
+        class="bg-gray-100 hover:bg-gray-200 text-gray-700 border border-gray-300 px-6 py-2.5 rounded-lg text-sm font-medium transition-colors">
+        Me contacter
+      </button>
+    </div>
+  </section>
 
-    </form>
+  <!-- À propos -->
+  <section class="max-w-4xl mx-auto mt-8 bg-white p-6 rounded-lg shadow-md mx-6 md:mx-auto">
+    <h2 class="font-display text-2xl font-bold text-gray-800 mb-4">À propos de moi</h2>
+    <p class="text-gray-600 leading-relaxed">
+      Étudiante en <strong>Réseaux, Services et Systèmes</strong>, je suis passionnée par les
+      infrastructures cloud, la virtualisation et l'administration système. Mon parcours couvre
+      Linux, Windows Server, les réseaux TCP/IP et les environnements cloud. Chaque défi technique
+      est une opportunité de comprendre et de maîtriser l'infrastructure.
+    </p>
+  </section>
 
+  <!-- Compétences -->
+  <section class="max-w-4xl mx-auto mt-6 bg-white p-6 rounded-lg shadow-md mx-6 md:mx-auto">
+    <h2 class="font-display text-2xl font-bold text-gray-800 mb-4">Compétences</h2>
+    <ul class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-gray-700 text-sm">
+      <li class="flex items-center gap-2 bg-gray-50 rounded-lg p-3 border border-gray-200">
+        <span class="text-blue-500 font-bold">●</span> Développement Web : HTML, CSS, JavaScript
+      </li>
+      <li class="flex items-center gap-2 bg-gray-50 rounded-lg p-3 border border-gray-200">
+        <span class="text-blue-500 font-bold">●</span> Développement Mobile : Flutter
+      </li>
+      <li class="flex items-center gap-2 bg-gray-50 rounded-lg p-3 border border-gray-200">
+        <span class="text-blue-500 font-bold">●</span> Design : Figma, Adobe XD
+      </li>
+      <li class="flex items-center gap-2 bg-gray-50 rounded-lg p-3 border border-gray-200">
+        <span class="text-blue-500 font-bold">●</span> Réseaux : TCP/IP, Routage, OSPF, BGP
+      </li>
+      <li class="flex items-center gap-2 bg-gray-50 rounded-lg p-3 border border-gray-200">
+        <span class="text-blue-500 font-bold">●</span> Systèmes : Linux, Windows Server
+      </li>
+      <li class="flex items-center gap-2 bg-gray-50 rounded-lg p-3 border border-gray-200">
+        <span class="text-blue-500 font-bold">●</span> Cloud : Virtualisation, Administration
+      </li>
+    </ul>
+  </section>
+
+  <!-- Projets récents -->
+  <section class="max-w-4xl mx-auto mt-6 mb-10 bg-white p-6 rounded-lg shadow-md mx-6 md:mx-auto">
+    <h2 class="font-display text-2xl font-bold text-gray-800 mb-4">Projets Récents</h2>
+    <ul class="space-y-2 text-gray-700 text-sm">
+      <li><strong>Projet 1 :</strong> Gestion des versions avec Git</li>
+      <li><strong>Projet 2 :</strong> Mise en place d'une infrastructure réseau avec routage et switching</li>
+      <li><strong>Projet 3 :</strong> Installation et configuration d'un serveur Ubuntu avec services web et sécurité</li>
+    </ul>
+  </section>
+</div>
+
+
+<!-- ═══════════════════════════════════════════════════════════
+     PAGE — LISTE DES PROJETS
+═══════════════════════════════════════════════════════════════ -->
+<div class="page" id="page-projets">
+  <div class="max-w-6xl mx-auto px-6 py-8">
+
+    <!-- En-tête -->
+    <div class="flex justify-between items-center mb-6">
+      <div>
+        <h2 class="font-display text-2xl font-bold text-gray-800">Mes Projets</h2>
+        <!-- Statut API -->
+        <div class="flex items-center gap-2 mt-1">
+          <div id="api-dot" class="w-2 h-2 rounded-full bg-gray-400"></div>
+          <span id="api-label" class="text-xs text-gray-400">Chargement...</span>
+        </div>
+      </div>
+      <button onclick="showPage('ajouter')"
+        class="bg-blue-500 hover:bg-blue-600 text-white px-5 py-2 rounded-lg text-sm font-medium transition-colors shadow">
+        + Nouveau projet
+      </button>
+    </div>
+
+    <!-- Grille des projets -->
+    <div id="projets-grid" class="grid md:grid-cols-3 gap-6">
+      <!-- Cartes insérées dynamiquement par gestionProjet.js -->
+      <div class="col-span-3 flex justify-center items-center py-16">
+        <div class="w-8 h-8 border-4 border-blue-200 border-t-blue-500 rounded-full animate-spin"></div>
+      </div>
+    </div>
   </div>
+</div>
 
-</section>
 
-<!-- ================= DETAIL MODAL -->
-<section id="section-detail"
-  class="hidden fixed inset-0 bg-black/70 flex items-center justify-center">
+<!-- ═══════════════════════════════════════════════════════════
+     PAGE — AJOUTER UN PROJET
+═══════════════════════════════════════════════════════════════ -->
+<div class="page" id="page-ajouter">
+  <div class="max-w-xl mx-auto mt-10 mb-10 px-4">
 
-  <div class="bg-gray-900 border border-gray-700 p-6 rounded-xl w-full max-w-lg relative">
+    <div class="mb-6">
+      <h2 class="font-display text-2xl font-bold text-gray-800">Ajouter un projet</h2>
+      <p class="text-gray-400 text-sm mt-1">Renseignez les informations de votre nouveau projet</p>
+    </div>
 
-    <button id="btnFermerDetail"
-      class="absolute top-2 right-3 text-xl text-gray-400 hover:text-white">
-      ✕
+    <div class="bg-white p-6 rounded-lg shadow-md">
+
+      <!-- Libellé -->
+      <div class="mb-5">
+        <label class="block text-sm font-semibold text-gray-700 mb-1">Libellé *</label>
+        <input
+          type="text"
+          id="f-libelle"
+          placeholder="Nom du projet"
+          class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
+          required
+        >
+      </div>
+
+      <!-- Description -->
+      <div class="mb-5">
+        <label class="block text-sm font-semibold text-gray-700 mb-1">Description *</label>
+        <textarea
+          id="f-description"
+          rows="4"
+          placeholder="Décrivez votre projet..."
+          class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400 resize-y"
+          required
+        ></textarea>
+      </div>
+
+      <!-- Image URL -->
+      <div class="mb-2">
+        <label class="block text-sm font-semibold text-gray-700 mb-1">Image (URL)</label>
+        <input
+          type="text"
+          id="f-image-url"
+          placeholder="https://... (optionnel)"
+          class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
+        >
+      </div>
+
+      <!-- Image fichier -->
+      <div class="mb-5">
+        <label class="block text-sm font-semibold text-gray-700 mb-1">— ou choisir un fichier</label>
+        <input
+          type="file"
+          id="f-image-file"
+          accept="image/*"
+          onchange="previewImage(event)"
+          class="w-full text-sm text-gray-500 file:mr-3 file:py-1.5 file:px-4 file:rounded-lg file:border-0 file:bg-blue-50 file:text-blue-600 hover:file:bg-blue-100"
+        >
+        <!-- Aperçu image -->
+        <img
+          id="f-preview"
+          alt="Aperçu"
+          class="mt-3 w-full h-40 object-cover rounded-lg border border-gray-200 hidden"
+        >
+      </div>
+
+      <!-- Technologies -->
+      <div class="mb-6">
+        <label class="block text-sm font-semibold text-gray-700 mb-1">Technologies utilisées</label>
+        <input
+          type="text"
+          id="f-technologies"
+          placeholder="HTML, CSS, JavaScript, ..."
+          class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
+        >
+      </div>
+
+      <!-- Bouton submit -->
+      <button
+        id="btn-ajouter"
+        onclick="ajouterProjet()"
+        class="w-full bg-blue-500 hover:bg-blue-600 text-white py-2.5 rounded-lg text-sm font-semibold transition-colors shadow">
+        Ajouter le projet
+      </button>
+    </div>
+  </div>
+</div>
+
+
+<!-- ═══════════════════════════════════════════════════════════
+     PAGE — DÉTAIL PROJET
+═══════════════════════════════════════════════════════════════ -->
+<div class="page" id="page-detail">
+  <div class="max-w-3xl mx-auto mt-8 mb-12 px-4">
+    <!-- Bouton retour -->
+    <button onclick="showPage('projets')"
+      class="mb-6 inline-flex items-center gap-1 text-blue-500 hover:underline text-sm">
+      ← Retour à la liste des projets
     </button>
-
-    <div id="detail-contenu"></div>
-
+    <!-- Contenu injecté par detailProjet.js -->
+    <div id="detail-content" class="bg-white p-6 rounded-lg shadow-md"></div>
   </div>
+</div>
 
-</section>
 
-</main>
+<!-- ═══════════════════════════════════════════════════════════
+     PAGE — CONTACT
+═══════════════════════════════════════════════════════════════ -->
+<div class="page" id="page-contact">
+  <div class="max-w-lg mx-auto mt-12 mb-12 px-4">
+    <h2 class="font-display text-2xl font-bold text-gray-800 mb-6">Me contacter</h2>
 
-<!-- ═════════════════════════════════ JS -->
-<script type="module" src="./src/main.js"></script>
+    <div class="bg-white p-6 rounded-lg shadow-md space-y-4">
+
+      <div class="flex items-center gap-4 p-4 bg-gray-50 rounded-lg border border-gray-200 hover:border-blue-400 transition-colors">
+        <div class="w-10 h-10 rounded-lg bg-blue-100 flex items-center justify-center text-lg flex-shrink-0">📧</div>
+        <div>
+          <div class="text-xs uppercase tracking-widest text-gray-400 font-semibold">Email</div>
+          <a href="mailto:nyacine183@gmail.com" class="text-blue-500 hover:underline text-sm font-medium">nyacine183@gmail.com</a>
+        </div>
+      </div>
+
+      <div class="flex items-center gap-4 p-4 bg-gray-50 rounded-lg border border-gray-200 hover:border-blue-400 transition-colors">
+        <div class="w-10 h-10 rounded-lg bg-blue-100 flex items-center justify-center text-lg flex-shrink-0">📞</div>
+        <div>
+          <div class="text-xs uppercase tracking-widest text-gray-400 font-semibold">Téléphone</div>
+          <span class="text-gray-700 text-sm font-medium">+221 77 129 73 86</span>
+        </div>
+      </div>
+
+      <div class="flex items-center gap-4 p-4 bg-gray-50 rounded-lg border border-gray-200 hover:border-blue-400 transition-colors">
+        <div class="w-10 h-10 rounded-lg bg-blue-100 flex items-center justify-center text-lg flex-shrink-0">📍</div>
+        <div>
+          <div class="text-xs uppercase tracking-widest text-gray-400 font-semibold">Localisation</div>
+          <span class="text-gray-700 text-sm font-medium">Dakar, Sénégal</span>
+        </div>
+      </div>
+
+      <!-- Réseaux sociaux -->
+      <div class="pt-2">
+        <div class="text-xs uppercase tracking-widest text-gray-400 font-semibold mb-3">Réseaux Sociaux</div>
+        <div class="flex gap-3 flex-wrap">
+          <a href="https://www.linkedin.com/in/mame-yacine-ndiaye-301925259/" target="_blank"
+            class="flex items-center gap-2 bg-gray-50 hover:bg-blue-50 border border-gray-200 hover:border-blue-400 text-gray-700 hover:text-blue-500 px-4 py-2 rounded-lg text-sm transition-colors">
+            💼 LinkedIn
+          </a>
+          <a href="https://github.com/dashboard" target="_blank"
+            class="flex items-center gap-2 bg-gray-50 hover:bg-blue-50 border border-gray-200 hover:border-blue-400 text-gray-700 hover:text-blue-500 px-4 py-2 rounded-lg text-sm transition-colors">
+            🐙 GitHub
+          </a>
+          <a href="https://www.facebook.com/" target="_blank"
+            class="flex items-center gap-2 bg-gray-50 hover:bg-blue-50 border border-gray-200 hover:border-blue-400 text-gray-700 hover:text-blue-500 px-4 py-2 rounded-lg text-sm transition-colors">
+            📘 Facebook
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ═══════════════════════════════════════════════════════════
+     FOOTER
+═══════════════════════════════════════════════════════════════ -->
+<footer class="bg-gray-900 text-gray-400 text-center text-sm py-4 mt-6">
+  <p>&copy; 2026 Mame Yacine Ndiaye — Fullstack Portfolio</p>
+</footer>
+
+
+<!-- ═══════════════════════════════════════════════════════════
+     TOAST (notification)
+═══════════════════════════════════════════════════════════════ -->
+<div id="toast"
+  class="fixed bottom-6 right-6 z-50 px-5 py-3 rounded-xl text-sm font-medium shadow-lg opacity-0 translate-y-8 transition-all duration-300 bg-blue-500 text-white">
+</div>
+
+
+<!-- ═══════════════════════════════════════════════════════════
+     MODAL — Confirmation suppression
+═══════════════════════════════════════════════════════════════ -->
+<div id="modal-overlay"
+  class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 hidden items-center justify-center">
+  <div class="bg-white rounded-2xl shadow-2xl p-8 max-w-sm w-11/12 text-center animate-[fadeUp_0.25s_ease]">
+    <div class="text-4xl mb-3">🗑</div>
+    <h3 class="font-display text-xl font-bold text-gray-800 mb-2">Supprimer le projet ?</h3>
+    <p class="text-gray-400 text-sm mb-6">Cette action est irréversible. Le projet sera définitivement supprimé.</p>
+    <div class="flex gap-3 justify-center">
+      <button onclick="fermerModal()"
+        class="bg-gray-100 hover:bg-gray-200 text-gray-700 border border-gray-200 px-5 py-2 rounded-lg text-sm transition-colors">
+        Annuler
+      </button>
+      <button id="btn-confirm-delete"
+        class="bg-red-500 hover:bg-red-600 text-white px-5 py-2 rounded-lg text-sm transition-colors">
+        Supprimer
+      </button>
+    </div>
+  </div>
+</div>
+
+
+<!-- ═══════════════════════════════════════════════════════════
+     SCRIPTS — ordre important
+═══════════════════════════════════════════════════════════════ -->
+<script src="js/api.js"></script>
+<script src="js/ui.js"></script>
+<script src="js/gestionProjet.js"></script>
+<script src="js/detailProjet.js"></script>
+<script src="js/main.js"></script>
 
 </body>
 </html>

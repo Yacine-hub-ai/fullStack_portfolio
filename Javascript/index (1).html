@@ -1,0 +1,1169 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mame Yacine — Portfolio</title>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0a0a0f;
+      --surface: #13131a;
+      --surface2: #1c1c26;
+      --border: #2a2a3a;
+      --accent: #6c63ff;
+      --accent2: #ff6584;
+      --accent3: #43e97b;
+      --text: #e8e8f0;
+      --muted: #7a7a9a;
+      --card-bg: #16161f;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* ─── NOISE OVERLAY ─── */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+     /* background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");*/
+      pointer-events: none;
+      z-index: 0;
+      opacity: .4;
+    }
+
+    /* ─── HEADER ─── */
+    header {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1rem 2.5rem;
+      background: rgba(10,10,15,0.85);
+      backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: .75rem;
+      font-family: 'Syne', sans-serif;
+      font-weight: 800;
+      font-size: 1.1rem;
+      letter-spacing: -0.02em;
+    }
+
+    .avatar {
+      width: 40px; height: 40px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      display: flex; align-items: center; justify-content: center;
+      font-size: .9rem; font-weight: 700;
+      flex-shrink: 0;
+    }
+
+    nav { display: flex; gap: .25rem; }
+
+    nav button {
+      background: none;
+      border: none;
+      color: var(--muted);
+      font-family: 'DM Sans', sans-serif;
+      font-size: .9rem;
+      padding: .5rem 1rem;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all .2s;
+    }
+    nav button:hover, nav button.active {
+      color: var(--text);
+      background: var(--surface2);
+    }
+    nav button.active { color: var(--accent); }
+
+    /* ─── PAGES ─── */
+    .page { display: none; animation: fadeUp .35s ease; }
+    .page.active { display: block; }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(16px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ─── HERO (Accueil) ─── */
+    .hero {
+      min-height: calc(100vh - 65px);
+      display: grid;
+      place-items: center;
+      text-align: center;
+      padding: 4rem 2rem;
+      position: relative;
+    }
+
+    .hero-glow {
+      position: absolute;
+      width: 500px; height: 500px;
+      background: radial-gradient(circle, rgba(108,99,255,.15) 0%, transparent 70%);
+      border-radius: 50%;
+      top: 50%; left: 50%;
+      transform: translate(-50%,-50%);
+      pointer-events: none;
+    }
+
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: .5rem;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 99px;
+      padding: .35rem 1rem;
+      font-size: .8rem;
+      color: var(--muted);
+      margin-bottom: 2rem;
+    }
+    .hero-badge span { width:8px; height:8px; border-radius:50%; background:var(--accent3); display:inline-block; animation: pulse 2s infinite; }
+
+    @keyframes pulse { 0%,100%{opacity:1;} 50%{opacity:.3;} }
+
+    .hero h1 {
+      font-family: 'Syne', sans-serif;
+      font-size: clamp(2.5rem, 6vw, 5rem);
+      font-weight: 800;
+      line-height: 1.05;
+      letter-spacing: -0.03em;
+      margin-bottom: 1.5rem;
+    }
+
+    .hero h1 .grad {
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .hero p {
+      font-size: 1.1rem;
+      color: var(--muted);
+      max-width: 520px;
+      margin: 0 auto 2.5rem;
+      line-height: 1.7;
+    }
+
+    .hero-cta {
+      display: flex;
+      gap: 1rem;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    .btn {
+      font-family: 'DM Sans', sans-serif;
+      font-size: .9rem;
+      font-weight: 500;
+      padding: .75rem 1.75rem;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: all .2s;
+      border: none;
+    }
+    .btn-primary {
+      background: var(--accent);
+      color: #fff;
+    }
+    .btn-primary:hover { background: #7c74ff; transform: translateY(-2px); box-shadow: 0 8px 24px rgba(108,99,255,.35); }
+    .btn-ghost {
+      background: var(--surface2);
+      color: var(--text);
+      border: 1px solid var(--border);
+    }
+    .btn-ghost:hover { border-color: var(--accent); color: var(--accent); transform: translateY(-2px); }
+
+    /* Skills & About sections */
+    .section {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 2rem;
+    }
+
+    .section-title {
+      font-family: 'Syne', sans-serif;
+      font-size: 1.6rem;
+      font-weight: 700;
+      margin-bottom: 1.5rem;
+      display: flex;
+      align-items: center;
+      gap: .75rem;
+    }
+    .section-title::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: var(--border);
+    }
+
+    .about-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 2rem;
+      line-height: 1.8;
+      color: var(--muted);
+      margin-bottom: 2rem;
+    }
+
+    .skills-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+      gap: 1rem;
+    }
+
+    .skill-chip {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: .85rem 1.25rem;
+      font-size: .85rem;
+      color: var(--text);
+      transition: border-color .2s;
+    }
+    .skill-chip:hover { border-color: var(--accent); }
+    .skill-chip strong { display: block; font-size: .7rem; text-transform: uppercase; letter-spacing: .08em; color: var(--accent); margin-bottom: .25rem; }
+
+    /* ─── PROJETS LIST ─── */
+    .projets-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 2rem 2rem 1.5rem;
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+
+    #projets-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 1.5rem;
+      padding: 0 2rem 4rem;
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+
+    .projet-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      overflow: hidden;
+      transition: transform .25s, box-shadow .25s, border-color .25s;
+      cursor: pointer;
+      animation: fadeUp .3s ease;
+    }
+    .projet-card:hover {
+      transform: translateY(-6px);
+      box-shadow: 0 20px 40px rgba(0,0,0,.4);
+      border-color: var(--accent);
+    }
+
+    .projet-card-img {
+      width: 100%; height: 180px;
+      object-fit: cover;
+      display: block;
+      background: var(--surface2);
+    }
+
+    .projet-card-img-placeholder {
+      width: 100%; height: 180px;
+      background: linear-gradient(135deg, var(--surface2), var(--border));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 3rem;
+    }
+
+    .projet-card-body {
+      padding: 1.25rem;
+    }
+
+    .projet-card-body h3 {
+      font-family: 'Syne', sans-serif;
+      font-size: 1rem;
+      font-weight: 700;
+      margin-bottom: .5rem;
+    }
+
+    .projet-card-body p {
+      font-size: .85rem;
+      color: var(--muted);
+      line-height: 1.6;
+      margin-bottom: 1rem;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    .projet-card-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: .4rem;
+      margin-bottom: 1rem;
+    }
+
+    .tag {
+      background: rgba(108,99,255,.15);
+      color: var(--accent);
+      font-size: .7rem;
+      padding: .2rem .6rem;
+      border-radius: 99px;
+      border: 1px solid rgba(108,99,255,.25);
+    }
+
+    .projet-card-actions {
+      display: flex;
+      gap: .5rem;
+    }
+
+    .btn-sm {
+      font-size: .8rem;
+      padding: .4rem .9rem;
+      border-radius: 7px;
+      cursor: pointer;
+      border: none;
+      font-family: 'DM Sans', sans-serif;
+      transition: all .15s;
+    }
+    .btn-detail { background: var(--accent); color:#fff; }
+    .btn-detail:hover { background: #7c74ff; }
+    .btn-delete { background: rgba(255,101,132,.1); color: var(--accent2); border: 1px solid rgba(255,101,132,.2); }
+    .btn-delete:hover { background: rgba(255,101,132,.2); }
+
+    /* ─── FORM PAGE ─── */
+    .form-wrapper {
+      max-width: 620px;
+      margin: 3rem auto;
+      padding: 0 2rem;
+    }
+
+    .form-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 2.5rem;
+    }
+
+    .form-group {
+      margin-bottom: 1.5rem;
+    }
+
+    .form-group label {
+      display: block;
+      font-size: .85rem;
+      font-weight: 500;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: .07em;
+      margin-bottom: .6rem;
+    }
+
+    .form-control {
+      width: 100%;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: .75rem 1rem;
+      color: var(--text);
+      font-family: 'DM Sans', sans-serif;
+      font-size: .95rem;
+      transition: border-color .2s;
+      outline: none;
+    }
+    .form-control:focus { border-color: var(--accent); }
+    .form-control::placeholder { color: var(--muted); }
+
+    textarea.form-control { resize: vertical; min-height: 100px; }
+
+    .form-img-preview {
+      width: 100%;
+      height: 160px;
+      object-fit: cover;
+      border-radius: 10px;
+      margin-top: .75rem;
+      display: none;
+      border: 1px solid var(--border);
+    }
+
+    /* ─── DETAIL PAGE ─── */
+    .detail-wrapper {
+      max-width: 800px;
+      margin: 3rem auto;
+      padding: 0 2rem 4rem;
+    }
+
+    .detail-img {
+      width: 100%;
+      height: 300px;
+      object-fit: cover;
+      border-radius: 16px;
+      margin-bottom: 2rem;
+      border: 1px solid var(--border);
+    }
+
+    .detail-img-placeholder {
+      width: 100%;
+      height: 300px;
+      background: linear-gradient(135deg, var(--surface2), var(--border));
+      border-radius: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 5rem;
+      margin-bottom: 2rem;
+    }
+
+    .detail-badge {
+      font-size: .75rem;
+      text-transform: uppercase;
+      letter-spacing: .1em;
+      color: var(--accent);
+      font-weight: 600;
+      margin-bottom: .75rem;
+    }
+
+    .detail-title {
+      font-family: 'Syne', sans-serif;
+      font-size: 2.2rem;
+      font-weight: 800;
+      margin-bottom: 1rem;
+      line-height: 1.15;
+    }
+
+    .detail-desc {
+      color: var(--muted);
+      line-height: 1.8;
+      margin-bottom: 2rem;
+      font-size: 1rem;
+    }
+
+    .detail-tech-list {
+      list-style: none;
+      display: flex;
+      flex-wrap: wrap;
+      gap: .5rem;
+      margin-bottom: 2.5rem;
+    }
+    .detail-tech-list li {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      padding: .4rem 1rem;
+      border-radius: 99px;
+      font-size: .85rem;
+    }
+
+    /* ─── CONTACT PAGE ─── */
+    .contact-wrapper {
+      max-width: 680px;
+      margin: 4rem auto;
+      padding: 0 2rem;
+      text-align: center;
+    }
+
+    .contact-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 3rem 2.5rem;
+      margin-top: 2rem;
+    }
+
+    .contact-item {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      padding: 1.25rem;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      margin-bottom: 1rem;
+      text-align: left;
+      transition: border-color .2s;
+    }
+    .contact-item:hover { border-color: var(--accent); }
+    .contact-icon {
+      width: 44px; height: 44px;
+      border-radius: 10px;
+      background: rgba(108,99,255,.15);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.2rem;
+      flex-shrink: 0;
+    }
+    .contact-label { font-size: .75rem; color: var(--muted); text-transform: uppercase; letter-spacing: .06em; }
+    .contact-value { font-weight: 500; font-size: .95rem; }
+    .contact-value a { color: var(--accent); text-decoration: none; }
+
+    .social-links {
+      display: flex;
+      justify-content: center;
+      gap: 1rem;
+      margin-top: 2rem;
+    }
+    .social-link {
+      display: flex; align-items: center; gap: .5rem;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: .6rem 1.25rem;
+      font-size: .85rem;
+      color: var(--text);
+      text-decoration: none;
+      transition: all .2s;
+    }
+    .social-link:hover { border-color: var(--accent); color: var(--accent); transform: translateY(-2px); }
+
+    /* ─── TOAST ─── */
+    #toast {
+      position: fixed;
+      bottom: 2rem; right: 2rem;
+      background: var(--accent);
+      color: #fff;
+      padding: .85rem 1.5rem;
+      border-radius: 12px;
+      font-size: .9rem;
+      font-weight: 500;
+      z-index: 999;
+      transform: translateY(100px);
+      opacity: 0;
+      transition: all .35s cubic-bezier(.34,1.56,.64,1);
+      box-shadow: 0 8px 24px rgba(108,99,255,.4);
+    }
+    #toast.show { transform: translateY(0); opacity: 1; }
+    #toast.error { background: var(--accent2); }
+
+    /* ─── MODAL CONFIRM ─── */
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,.7);
+      backdrop-filter: blur(4px);
+      z-index: 200;
+      place-items: center;
+    }
+    .modal-overlay.open { display: grid; }
+
+    .modal {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 2.5rem;
+      max-width: 420px;
+      width: 90%;
+      text-align: center;
+      animation: fadeUp .25s ease;
+    }
+    .modal h3 { font-family:'Syne',sans-serif; font-size:1.3rem; margin-bottom:.75rem; }
+    .modal p { color:var(--muted); margin-bottom:2rem; }
+    .modal-actions { display:flex; gap:.75rem; justify-content:center; }
+
+    /* ─── FOOTER ─── */
+    footer {
+      border-top: 1px solid var(--border);
+      text-align: center;
+      padding: 1.5rem;
+      color: var(--muted);
+      font-size: .85rem;
+    }
+
+    /* ─── EMPTY STATE ─── */
+    .empty-state {
+      grid-column: 1 / -1;
+      text-align: center;
+      padding: 5rem 2rem;
+    }
+    .empty-state .emoji { font-size: 3.5rem; margin-bottom: 1rem; }
+    .empty-state h3 { font-family:'Syne',sans-serif; margin-bottom:.5rem; }
+    .empty-state p { color:var(--muted); margin-bottom:1.5rem; }
+
+    /* ─── LOADER ─── */
+    .loader {
+      display: inline-block;
+      width: 18px; height: 18px;
+      border: 2px solid rgba(255,255,255,.3);
+      border-top-color: #fff;
+      border-radius: 50%;
+      animation: spin .6s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .api-status {
+      display: flex;
+      align-items: center;
+      gap: .5rem;
+      font-size: .75rem;
+      color: var(--muted);
+    }
+    .api-dot { width:8px; height:8px; border-radius:50%; background: var(--accent2); }
+    .api-dot.online { background: var(--accent3); }
+    .yass{
+      width: 50px;
+    }
+  </style>
+</head>
+<body>
+
+<!-- ─── HEADER ─── -->
+<header>
+  <div class="brand">
+    <div class="avatar"><img src="yass1.jpeg" class="yass"></div>
+    <span>Mame Yacine Ndiaye</span>
+  </div>
+  <nav>
+    <button onclick="showPage('accueil')" class="active" id="nav-accueil">Accueil</button>
+    <button onclick="showPage('projets')" id="nav-projets">Projets</button>
+    <button onclick="showPage('ajouter')" id="nav-ajouter">Ajouter</button>
+    <button onclick="showPage('contact')" id="nav-contact">Contact</button>
+  </nav>
+</header>
+
+<!-- ─── PAGE ACCUEIL ─── -->
+<div class="page active" id="page-accueil">
+  <div class="hero">
+    <div class="hero-glow"></div>
+    <div>
+      <div class="hero-badge"><span></span> Disponible pour des projets</div>
+      <h1>Bienvenue sur mon<br><span class="grad">Portfolio Fullstack</span></h1>
+      <p>Étudiante en Réseaux, Services & Systèmes — passionnée par les infrastructures cloud, la virtualisation et l'administration système.</p>
+      <div class="hero-cta">
+        <button class="btn btn-primary" onclick="showPage('projets')">Voir mes projets →</button>
+        <button class="btn btn-ghost" onclick="showPage('contact')">Me contacter</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <h2 class="section-title">À propos</h2>
+    <div class="about-card">
+      Mon parcours couvre <strong>Linux</strong>, <strong>Windows Server</strong>, les réseaux TCP/IP et les environnements cloud. Chaque défi technique est une opportunité de comprendre et de maîtriser l'infrastructure. Je développe aussi des interfaces web modernes et des applications mobiles cross-platform.
+    </div>
+
+    <h2 class="section-title">Compétences</h2>
+    <div class="skills-grid">
+      <div class="skill-chip"><strong>Frontend</strong>HTML, CSS, JavaScript</div>
+      <div class="skill-chip"><strong>Mobile</strong>Flutter</div>
+      <div class="skill-chip"><strong>Design</strong>Figma, Adobe XD</div>
+      <div class="skill-chip"><strong>Réseaux</strong>TCP/IP, Routage</div>
+      <div class="skill-chip"><strong>Systèmes</strong>Linux, Windows Server</div>
+      <div class="skill-chip"><strong>Cloud</strong>Virtualisation, Cloud</div>
+    </div>
+  </div>
+</div>
+
+<!-- ─── PAGE PROJETS ─── -->
+<div class="page" id="page-projets">
+  <div class="projets-header">
+    <div>
+      <h2 style="font-family:'Syne',sans-serif;font-size:1.8rem;font-weight:800;">Mes Projets</h2>
+      <div class="api-status" id="api-status">
+        <div class="api-dot" id="api-dot"></div>
+        <span id="api-label">Chargement...</span>
+      </div>
+    </div>
+    <button class="btn btn-primary" onclick="showPage('ajouter')">+ Nouveau projet</button>
+  </div>
+  <div id="projets-grid">
+    <div style="grid-column:1/-1;text-align:center;padding:3rem;color:var(--muted)">
+      <div class="loader"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ─── PAGE AJOUTER ─── -->
+<div class="page" id="page-ajouter">
+  <div class="form-wrapper">
+    <div style="margin-bottom:1.5rem;">
+      <h2 style="font-family:'Syne',sans-serif;font-size:1.8rem;font-weight:800;">Nouveau projet</h2>
+      <p style="color:var(--muted);margin-top:.5rem;font-size:.9rem;">Ajoutez un projet à mon portfolio</p>
+    </div>
+    <div class="form-card">
+      <div class="form-group">
+        <label>Libellé *</label>
+        <input type="text" id="f-libelle" class="form-control" placeholder="Nom du projet" required>
+      </div>
+      <div class="form-group">
+        <label>Description *</label>
+        <textarea id="f-description" class="form-control" placeholder="Décrivez votre projet..." required></textarea>
+      </div>
+      <div class="form-group">
+        <label>Image (URL ou fichier)</label>
+        <input type="text" id="f-image-url" class="form-control" placeholder="https://... ou laissez vide">
+        <input type="file" id="f-image-file" accept="image/*" class="form-control" style="margin-top:.5rem;" onchange="previewImage(event)">
+        <img id="f-preview" class="form-img-preview" alt="Aperçu">
+      </div>
+      <div class="form-group">
+        <label>Technologies utilisées</label>
+        <input type="text" id="f-technologies" class="form-control" placeholder="HTML, CSS, JavaScript, ...">
+      </div>
+      <button class="btn btn-primary" style="width:100%;" onclick="ajouterProjet()" id="btn-ajouter">
+        Ajouter le projet
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ─── PAGE DÉTAIL ─── -->
+<div class="page" id="page-detail">
+  <div class="detail-wrapper">
+    <button class="btn btn-ghost" style="margin-bottom:1.5rem;" onclick="showPage('projets')">← Retour aux projets</button>
+    <div id="detail-content"></div>
+  </div>
+</div>
+
+<!-- ─── PAGE CONTACT ─── -->
+<div class="page" id="page-contact">
+  <div class="contact-wrapper">
+    <h2 style="font-family:'Syne',sans-serif;font-size:1.8rem;font-weight:800;">Contact</h2>
+    <p style="color:var(--muted);margin-top:.5rem;">Disponible pour des collaborations & projets</p>
+
+    <div class="contact-card">
+      <div class="contact-item">
+        <div class="contact-icon">📧</div>
+        <div>
+          <div class="contact-label">Email</div>
+          <div class="contact-value"><a href="mailto:nyacine183@gmail.com">nyacine183@gmail.com</a></div>
+        </div>
+      </div>
+      <div class="contact-item">
+        <div class="contact-icon">📞</div>
+        <div>
+          <div class="contact-label">Téléphone</div>
+          <div class="contact-value">+221 77 129 73 86</div>
+        </div>
+      </div>
+      <div class="contact-item">
+        <div class="contact-icon">📍</div>
+        <div>
+          <div class="contact-label">Localisation</div>
+          <div class="contact-value">Keur Massar, Dakar, Sénégal</div>
+        </div>
+      </div>
+
+      <div class="social-links">
+        <a href="https://www.linkedin.com/in/mame-yacine-ndiaye-301925259/" target="_blank" class="social-link">💼 LinkedIn</a>
+        <a href="https://github.com/dashboard" target="_blank" class="social-link">🐙 GitHub</a>
+        <a href="https://www.facebook.com/" target="_blank" class="social-link">📘 Facebook</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ─── FOOTER ─── -->
+<footer>
+  <p>&copy; 2026 Mame Yacine Ndiaye — Fullstack Portfolio</p>
+</footer>
+
+<!-- ─── TOAST ─── -->
+<div id="toast"></div>
+
+<!-- ─── MODAL CONFIRM SUPPRESSION ─── -->
+<div class="modal-overlay" id="modal-overlay">
+  <div class="modal">
+    <h3>Supprimer le projet ?</h3>
+    <p>Cette action est irréversible. Le projet sera définitivement supprimé.</p>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="fermerModal()">Annuler</button>
+      <button class="btn" style="background:var(--accent2);color:#fff;" id="btn-confirm-delete">Supprimer</button>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ═══════════════════════════════════════════════════════════════
+   CONFIGURATION — JSON Server factice (localStorage comme backend)
+   Pour utiliser un vrai json-server :
+     1. npm install -g json-server
+     2. json-server --watch db.json --port 3000
+   et changer API_URL = 'http://localhost:3000'
+═══════════════════════════════════════════════════════════════ */
+const API_URL = null; // null = mode localStorage (offline), 'http://localhost:3000' = json-server
+
+/* ─── DONNÉES INITIALES ─── */
+const PROJETS_INITIAUX = [
+  {
+    id: 1,
+    libelle: "Gestion de version avec Git",
+    description: "La gestion des versions avec Git permet de suivre, d'enregistrer et de gérer les modifications apportées aux fichiers d'un projet au fil du temps.",
+    image: "",
+    technologies: "Git, Terminal, GitHub"
+  },
+  {
+    id: 2,
+    libelle: "Routage réseau",
+    description: "Le routage est le processus par lequel un routeur sélectionne le meilleur chemin pour acheminer des paquets de données d'un point A vers un point B à travers différents réseaux interconnectés.",
+    image: "",
+    technologies: "OSPF, BGP, EIGRP, Dijkstra"
+  },
+  {
+    id: 3,
+    libelle: "Serveur Linux Ubuntu",
+    description: "Un serveur Linux est un ordinateur (physique ou virtuel) qui utilise Linux pour fournir des services, des données ou des ressources à d'autres ordinateurs sur un réseau.",
+    image: "",
+    technologies: "Ubuntu, SSH, Ansible, Cockpit"
+  }
+];
+
+/* ═══════════════════════════════════════════════════════════════
+   COUCHE API — abstraction localStorage / json-server
+═══════════════════════════════════════════════════════════════ */
+const Api = {
+  /* Initialise le localStorage si vide */
+  init() {
+    if (!localStorage.getItem('projets')) {
+      localStorage.setItem('projets', JSON.stringify(PROJETS_INITIAUX));
+      localStorage.setItem('nextId', '4');
+    }
+    updateApiStatus(true);
+  },
+
+  async getAll() {
+    if (API_URL) {
+      const r = await fetch(`${API_URL}/projets`);
+      return r.json();
+    }
+    return JSON.parse(localStorage.getItem('projets') || '[]');
+  },
+
+  async getById(id) {
+    if (API_URL) {
+      const r = await fetch(`${API_URL}/projets/${id}`);
+      return r.json();
+    }
+    const projets = JSON.parse(localStorage.getItem('projets') || '[]');
+    return projets.find(p => p.id == id) || null;
+  },
+
+  async create(data) {
+    if (API_URL) {
+      const r = await fetch(`${API_URL}/projets`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data)
+      });
+      return r.json();
+    }
+    const projets = JSON.parse(localStorage.getItem('projets') || '[]');
+    const id = parseInt(localStorage.getItem('nextId') || '1');
+    const nouveau = { ...data, id };
+    projets.push(nouveau);
+    localStorage.setItem('projets', JSON.stringify(projets));
+    localStorage.setItem('nextId', String(id + 1));
+    return nouveau;
+  },
+
+  async delete(id) {
+    if (API_URL) {
+      await fetch(`${API_URL}/projets/${id}`, { method: 'DELETE' });
+      return;
+    }
+    let projets = JSON.parse(localStorage.getItem('projets') || '[]');
+    projets = projets.filter(p => p.id != id);
+    localStorage.setItem('projets', JSON.stringify(projets));
+  }
+};
+
+/* ═══════════════════════════════════════════════════════════════
+   NAVIGATION SPA
+═══════════════════════════════════════════════════════════════ */
+function showPage(page) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('nav button').forEach(b => b.classList.remove('active'));
+
+  document.getElementById(`page-${page}`).classList.add('active');
+  const navBtn = document.getElementById(`nav-${page}`);
+  if (navBtn) navBtn.classList.add('active');
+
+  if (page === 'projets') afficherProjets();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   CRÉATION D'UN NŒUD PROJET
+═══════════════════════════════════════════════════════════════ */
+function creerProjet(projet) {
+  const card = document.createElement('div');
+  card.className = 'projet-card';
+  card.id = `projet-${projet.id}`;
+
+  const imgHtml = projet.image
+    ? `<img src="${projet.image}" alt="${projet.libelle}" class="projet-card-img" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+       <div class="projet-card-img-placeholder" style="display:none">🖼️</div>`
+    : `<div class="projet-card-img-placeholder">🖼️</div>`;
+
+  const tags = projet.technologies
+    ? projet.technologies.split(',').map(t => `<span class="tag">${t.trim()}</span>`).join('')
+    : '';
+
+  card.innerHTML = `
+    ${imgHtml}
+    <div class="projet-card-body">
+      <h3>${escHtml(projet.libelle)}</h3>
+      <p>${escHtml(projet.description)}</p>
+      <div class="projet-card-tags">${tags}</div>
+      <div class="projet-card-actions">
+        <button class="btn-sm btn-detail" onclick="detaillerProjet(${projet.id})">Voir détails</button>
+        <button class="btn-sm btn-delete" onclick="demanderSuppression(${projet.id})">Supprimer</button>
+      </div>
+    </div>
+  `;
+  return card;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   AFFICHER TOUS LES PROJETS
+═══════════════════════════════════════════════════════════════ */
+async function afficherProjets() {
+  const grid = document.getElementById('projets-grid');
+  grid.innerHTML = `<div style="grid-column:1/-1;text-align:center;padding:3rem;color:var(--muted)"><div class="loader"></div></div>`;
+
+  try {
+    const projets = await Api.getAll();
+
+    if (projets.length === 0) {
+      grid.innerHTML = `
+        <div class="empty-state">
+          <div class="emoji">📂</div>
+          <h3>Aucun projet</h3>
+          <p>Commencez par ajouter votre premier projet.</p>
+          <button class="btn btn-primary" onclick="showPage('ajouter')">+ Ajouter un projet</button>
+        </div>`;
+      return;
+    }
+
+    grid.innerHTML = '';
+    // Insérer les cartes dans l'ordre inverse (dernier ajouté en premier)
+    [...projets].reverse().forEach(p => {
+      grid.appendChild(creerProjet(p));
+    });
+
+  } catch (err) {
+    grid.innerHTML = `<div class="empty-state"><div class="emoji">⚠️</div><h3>Erreur de chargement</h3><p>${err.message}</p></div>`;
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   AJOUTER UN PROJET
+═══════════════════════════════════════════════════════════════ */
+async function ajouterProjet() {
+  const libelle = document.getElementById('f-libelle').value.trim();
+  const description = document.getElementById('f-description').value.trim();
+  const imageUrl = document.getElementById('f-image-url').value.trim();
+  const technologies = document.getElementById('f-technologies').value.trim();
+  const fileInput = document.getElementById('f-image-file');
+
+  if (!libelle || !description) {
+    showToast('Libellé et description sont obligatoires.', 'error');
+    return;
+  }
+
+  const btn = document.getElementById('btn-ajouter');
+  btn.innerHTML = '<span class="loader"></span>';
+  btn.disabled = true;
+
+  // Lire l'image (fichier ou URL)
+  let image = imageUrl;
+  if (!image && fileInput.files[0]) {
+    image = await lireImageBase64(fileInput.files[0]);
+  }
+
+  try {
+    const nouveau = await Api.create({ libelle, description, image, technologies });
+
+    // Insérer la carte en premier dans la grille
+    const grid = document.getElementById('projets-grid');
+    const card = creerProjet(nouveau);
+    if (grid.querySelector('.empty-state')) {
+      grid.innerHTML = '';
+    }
+    grid.insertBefore(card, grid.firstChild);
+
+    // Reset form
+    document.getElementById('f-libelle').value = '';
+    document.getElementById('f-description').value = '';
+    document.getElementById('f-image-url').value = '';
+    document.getElementById('f-image-file').value = '';
+    document.getElementById('f-preview').style.display = 'none';
+    document.getElementById('f-technologies').value = '';
+
+    showToast('✓ Projet ajouté avec succès !');
+    showPage('projets');
+  } catch (err) {
+    showToast('Erreur lors de l\'ajout : ' + err.message, 'error');
+  } finally {
+    btn.innerHTML = 'Ajouter le projet';
+    btn.disabled = false;
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   DÉTAILLER UN PROJET
+═══════════════════════════════════════════════════════════════ */
+async function detaillerProjet(id) {
+  showPage('detail');
+  const container = document.getElementById('detail-content');
+  container.innerHTML = `<div style="text-align:center;padding:3rem;color:var(--muted)"><div class="loader"></div></div>`;
+
+  try {
+    const p = await Api.getById(id);
+    if (!p) throw new Error('Projet introuvable');
+
+    const imgHtml = p.image
+      ? `<img src="${p.image}" alt="${p.libelle}" class="detail-img" onerror="this.outerHTML='<div class=detail-img-placeholder>🖼️</div>'">`
+      : `<div class="detail-img-placeholder">🖼️</div>`;
+
+    const techItems = p.technologies
+      ? p.technologies.split(',').map(t => `<li>${escHtml(t.trim())}</li>`).join('')
+      : '<li>Non précisé</li>';
+
+    container.innerHTML = `
+      ${imgHtml}
+      <div class="detail-badge">Projet #${p.id}</div>
+      <h2 class="detail-title">${escHtml(p.libelle)}</h2>
+      <p class="detail-desc">${escHtml(p.description)}</p>
+      <h3 style="font-family:'Syne',sans-serif;font-size:1rem;margin-bottom:.75rem;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;">Technologies utilisées</h3>
+      <ul class="detail-tech-list">${techItems}</ul>
+      <div style="display:flex;gap:.75rem;">
+        <button class="btn btn-ghost" onclick="showPage('projets')">← Retour</button>
+        <button class="btn" style="background:rgba(255,101,132,.1);color:var(--accent2);border:1px solid rgba(255,101,132,.2);" onclick="demanderSuppression(${p.id})">Supprimer ce projet</button>
+      </div>
+    `;
+  } catch (err) {
+    container.innerHTML = `<div class="empty-state"><div class="emoji">⚠️</div><h3>${err.message}</h3></div>`;
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   SUPPRIMER UN PROJET
+═══════════════════════════════════════════════════════════════ */
+let idASupprimer = null;
+
+function demanderSuppression(id) {
+  idASupprimer = id;
+  document.getElementById('modal-overlay').classList.add('open');
+}
+
+function fermerModal() {
+  document.getElementById('modal-overlay').classList.remove('open');
+  idASupprimer = null;
+}
+
+document.getElementById('btn-confirm-delete').addEventListener('click', async () => {
+  if (idASupprimer === null) return;
+  const id = idASupprimer;
+  fermerModal();
+
+  try {
+    await Api.delete(id);
+
+    // Retirer la carte de l'interface si visible
+    const card = document.getElementById(`projet-${id}`);
+    if (card) {
+      card.style.transition = 'opacity .3s, transform .3s';
+      card.style.opacity = '0';
+      card.style.transform = 'scale(0.9)';
+      setTimeout(() => {
+        card.remove();
+        const grid = document.getElementById('projets-grid');
+        if (grid && grid.children.length === 0) {
+          grid.innerHTML = `
+            <div class="empty-state">
+              <div class="emoji">📂</div>
+              <h3>Aucun projet</h3>
+              <p>Commencez par ajouter votre premier projet.</p>
+              <button class="btn btn-primary" onclick="showPage('ajouter')">+ Ajouter un projet</button>
+            </div>`;
+        }
+      }, 300);
+    }
+
+    showToast('🗑 Projet supprimé.');
+    if (document.getElementById('page-detail').classList.contains('active')) {
+      showPage('projets');
+    }
+  } catch (err) {
+    showToast('Erreur : ' + err.message, 'error');
+  }
+});
+
+/* ═══════════════════════════════════════════════════════════════
+   UTILITAIRES
+═══════════════════════════════════════════════════════════════ */
+function escHtml(str) {
+  const d = document.createElement('div');
+  d.textContent = str || '';
+  return d.innerHTML;
+}
+
+function previewImage(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    const img = document.getElementById('f-preview');
+    img.src = e.target.result;
+    img.style.display = 'block';
+  };
+  reader.readAsDataURL(file);
+}
+
+function lireImageBase64(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = e => resolve(e.target.result);
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
+}
+
+let toastTimer;
+function showToast(msg, type = 'success') {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = type === 'error' ? 'error show' : 'show';
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => { t.className = ''; }, 3000);
+}
+
+function updateApiStatus(online) {
+  const dot = document.getElementById('api-dot');
+  const label = document.getElementById('api-label');
+  if (!dot) return;
+  if (online) {
+    dot.classList.add('online');
+    label.textContent = API_URL ? `Connecté à ${API_URL}` : 'Mode hors-ligne (localStorage)';
+  } else {
+    dot.classList.remove('online');
+    label.textContent = 'Hors-ligne';
+  }
+}
+
+/* Fermer modal au clic overlay */
+document.getElementById('modal-overlay').addEventListener('click', e => {
+  if (e.target === document.getElementById('modal-overlay')) fermerModal();
+});
+
+/* ═══════════════════════════════════════════════════════════════
+   INITIALISATION
+═══════════════════════════════════════════════════════════════ */
+Api.init();
+</script>
+</body>
+</html>

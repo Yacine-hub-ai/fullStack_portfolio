@@ -1,59 +1,45 @@
-import "src/output.css"
+/**
+ * main.js
+ * ──────────────────────────────────────────────────────────────
+ * Point d'entrée de l'application SPA Portfolio.
+ * Initialise l'API, affiche la page d'accueil,
+ * et configure la photo de profil.
+ *
+ * Ordre de chargement dans index.html :
+ *   1. api.js
+ *   2. ui.js
+ *   3. gestionProjet.js
+ *   4. detailProjet.js
+ *   5. main.js  ← ce fichier (dernier)
+ * ──────────────────────────────────────────────────────────────
+ */
 
-const conteneur = document.getElementById("conteneur-projets");
-const form = document.getElementById("formulaireProjet");
-const compteur = document.getElementById("compteurProjets");
+document.addEventListener('DOMContentLoaded', () => {
 
-let projets = [];
+  /* ── 1. Initialiser l'API (localStorage) ── */
+  Api.init();
+  updateApiStatus(true, typeof API_URL !== 'undefined' ? API_URL : null);
 
-function ajouterProjet(libelle, image) {
-    const projet = {
-      id: Date.now(),
-      libelle,
-      image
-    };
-  
-    projets.push(projet);
-    creerProjet(projet.id, projet.libelle, projet.image);
-  
-    updateCount();
+  /* ── 2. Afficher la page d'accueil par défaut ── */
+  showPage('accueil');
+
+  /* ── 3. Photo de profil — chargement dynamique ── */
+  // Remplacez 'yass1.jpeg' par le chemin réel de votre photo
+  // ou laissez le placeholder avec les initiales "MY"
+  const PHOTO_PROFIL = 'yass1.jpeg'; // ← votre photo ici
+
+  const avatarImg  = document.getElementById('avatar-img');
+  const avatarText = document.getElementById('avatar-text');
+
+  if (avatarImg && PHOTO_PROFIL) {
+    avatarImg.src = PHOTO_PROFIL;
+    avatarImg.onload  = () => { avatarImg.classList.remove('hidden'); avatarText.classList.add('hidden'); };
+    avatarImg.onerror = () => { avatarImg.classList.add('hidden'); avatarText.classList.remove('hidden'); };
   }
 
-  function supprimerProjet(id, element) {
-    projets = projets.filter(p => p.id !== id);
-    element.remove();
-    updateCount();
-  }
-
-  form.addEventListener("submit", (e) => {
-    e.preventDefault();
-  
-    ajouterProjet(
-      libelle.value,
-      "https://via.placeholder.com/400"
-    );
-  
-    form.reset();
+  /* ── 4. Gestion clavier : Escape ferme le modal ── */
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape') fermerModal();
   });
 
-  function updateCount() {
-    compteur.textContent = `${projets.length} projets`;
-  }
-
-  form.addEventListener("submit", (e) => {
-    e.preventDefault();
-  
-    ajouterProjet(
-      libelle.value,
-      "https://via.placeholder.com/400"
-    );
-  
-    form.reset();
-  });
-
-  fetch("http://localhost:3000/projets")
-  .then(res => res.json())
-  .then(data => {
-    projets = data;
-    projets.forEach(p => creerProjet(p.id, p.libelle, p.image));
-  });
+});
