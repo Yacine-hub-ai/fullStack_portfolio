@@ -140,7 +140,7 @@ export default function DetaillerProjet({ projet, onAnnuler, onEditer, onSupprim
               onClick={() => setEditMode(true)}
               className="bg-blue-500 hover:bg-blue-600 text-white px-5 py-2 rounded-lg text-sm transition-colors"
             >
-              ✏️ Éditer
+              Éditer
             </button>
 
             {/* Supprimer */}
@@ -148,7 +148,7 @@ export default function DetaillerProjet({ projet, onAnnuler, onEditer, onSupprim
               onClick={() => onSupprimer(projet.id)}
               className="bg-red-50 hover:bg-red-100 text-red-600 border border-red-200 px-5 py-2 rounded-lg text-sm transition-colors"
             >
-              🗑 Supprimer
+               Supprimer
             </button>
           </div>
         </div>
