@@ -156,13 +156,14 @@ pipeline {
                     if (packageContent.contains('"test"')) {
                         echo "Lancement des tests backend..."
                         sh """
-                            docker run --rm \\
-                                --name portfolio-test-${BUILD_NUMBER} \\
-                                --add-host=host.docker.internal:host-gateway \\
-                                -e API_URL=http://host.docker.internal:3001 \\
-                                ${BACKEND_IMAGE}:latest \\
-                                node --test --test-timeout=15000 tests/api.test.js
+                            # Installer Node.js si absent
+                            which node || (apt-get update -qq && apt-get install -y -qq nodejs)
+                            # Installer les dépendances de test
+                            cd ${WORKSPACE}/docker/backend && npm install
+                            # Lancer les tests contre le backend déployé
+                            API_URL=http://localhost:3001 node --test --test-timeout=15000 tests/api.test.js
                         """
+                        echo "✅ Tests backend passés"
                     } else {
                         echo "⚠️  Aucun script 'test' défini dans package.json — stage ignoré"
                     }
