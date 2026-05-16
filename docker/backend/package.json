@@ -5,7 +5,8 @@
   "main": "app.js",
   "type": "module",
   "scripts": {
-    "start": "node app.js"
+    "start": "node app.js",
+    "test": "node --test --test-timeout=15000 tests/api.test.js"
   },
   "dependencies": {
     "cors": "^2.8.5",

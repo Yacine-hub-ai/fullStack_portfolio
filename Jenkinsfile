@@ -1,0 +1,224 @@
+pipeline {
+
+    agent any
+
+    // ── Variables d'environnement ──────────────────────────────
+    environment {
+        BACKEND_IMAGE  = 'portfolio-backend'
+        FRONTEND_IMAGE = 'portfolio-frontend'
+        COMPOSE_FILE   = 'docker/docker-compose.yml'
+        DOCKERHUB_USER = 'cineya'   // ← ton username Docker Hub
+        REPO_URL       = 'https://github.com/Yacine-hub-ai/fullStack_portfolio.git'
+    }
+
+    // ── Options globales ───────────────────────────────────────
+    options {
+        buildDiscarder(logRotator(numToKeepStr: '10'))
+        timeout(time: 30, unit: 'MINUTES')
+        timestamps()
+    }
+
+    // ── Déclenchement automatique via webhook GitHub ───────────
+    triggers {
+        githubPush()
+    }
+
+    // ══════════════════════════════════════════════════════════
+    stages {
+
+        // ── Stage 1 : Checkout ─────────────────────────────────
+        stage('Checkout') {
+            steps {
+                checkout([
+                    $class: 'GitSCM',
+                    branches: [[name: "*/${env.BRANCH_NAME ?: 'main'}"]],
+                    userRemoteConfigs: [[
+                        url: "${REPO_URL}",
+                        credentialsId: 'github-token'
+                    ]]
+                ])
+                script {
+                    env.GIT_SHORT = sh(
+                        script: 'git rev-parse --short HEAD',
+                        returnStdout: true
+                    ).trim()
+                }
+                echo "✅ Checkout — branche: ${env.BRANCH_NAME ?: 'main'} | commit: ${env.GIT_SHORT}"
+                echo "   Déclenchement : ${currentBuild.getBuildCauses()[0]?.shortDescription ?: 'Manuel'}"
+            }
+        }
+
+        // ── Stage 2 : Build (backend + frontend en parallèle) ──
+        stage('Build') {
+            parallel {
+
+                stage('Build Backend') {
+                    steps {
+                        sh """
+                            docker build \\
+                                --build-arg NODE_ENV=production \\
+                                -t ${BACKEND_IMAGE}:${BUILD_NUMBER}-${GIT_SHORT} \\
+                                -t ${BACKEND_IMAGE}:latest \\
+                                docker/backend/
+                            echo "Backend image size: \$(docker image inspect ${BACKEND_IMAGE}:latest --format='{{.Size}}') bytes"
+                        """
+                    }
+                }
+
+                stage('Build Frontend') {
+                    steps {
+                        sh """
+                            docker build \\
+                                -t ${FRONTEND_IMAGE}:${BUILD_NUMBER}-${GIT_SHORT} \\
+                                -t ${FRONTEND_IMAGE}:latest \\
+                                -f docker/frontend/Dockerfile \\
+                                .
+                            echo "Frontend image size: \$(docker image inspect ${FRONTEND_IMAGE}:latest --format='{{.Size}}') bytes"
+                        """
+                    }
+                }
+            }
+        }
+
+        // ── Stage 3 : Push vers Docker Hub ─────────────────────
+        stage('Push to Docker Hub') {
+            steps {
+                withCredentials([usernamePassword(
+                    credentialsId: 'dockerhub-credentials',
+                    usernameVariable: 'DOCKERHUB_LOGIN',
+                    passwordVariable: 'DOCKERHUB_PASSWORD'
+                )]) {
+                    sh """
+                        echo \$DOCKERHUB_PASSWORD | docker login -u \$DOCKERHUB_LOGIN --password-stdin
+
+                        # Taguer et pousser le backend
+                        docker tag ${BACKEND_IMAGE}:latest \$DOCKERHUB_LOGIN/${BACKEND_IMAGE}:${BUILD_NUMBER}-${GIT_SHORT}
+                        docker tag ${BACKEND_IMAGE}:latest \$DOCKERHUB_LOGIN/${BACKEND_IMAGE}:latest
+                        docker push \$DOCKERHUB_LOGIN/${BACKEND_IMAGE}:${BUILD_NUMBER}-${GIT_SHORT}
+                        docker push \$DOCKERHUB_LOGIN/${BACKEND_IMAGE}:latest
+
+                        # Taguer et pousser le frontend
+                        docker tag ${FRONTEND_IMAGE}:latest \$DOCKERHUB_LOGIN/${FRONTEND_IMAGE}:${BUILD_NUMBER}-${GIT_SHORT}
+                        docker tag ${FRONTEND_IMAGE}:latest \$DOCKERHUB_LOGIN/${FRONTEND_IMAGE}:latest
+                        docker push \$DOCKERHUB_LOGIN/${FRONTEND_IMAGE}:${BUILD_NUMBER}-${GIT_SHORT}
+                        docker push \$DOCKERHUB_LOGIN/${FRONTEND_IMAGE}:latest
+
+                        docker logout
+                    """
+                }
+                echo "✅ Images poussées vers Docker Hub — tags: latest + ${BUILD_NUMBER}-${GIT_SHORT}"
+            }
+        }
+
+        // ── Stage 4 : Test ─────────────────────────────────────
+        stage('Test') {
+            steps {
+                script {
+                    def packageJson = readJSON file: 'docker/backend/package.json'
+                    if (packageJson.scripts?.test) {
+                        echo "Lancement des tests backend..."
+                        sh """
+                            docker run --rm \\
+                                --name portfolio-test-${BUILD_NUMBER} \\
+                                --network portfolio-net \\
+                                -e API_URL=http://portfolio-backend:3001 \\
+                                --build-arg NODE_ENV=test \\
+                                ${BACKEND_IMAGE}:latest \\
+                                node --test --test-timeout=15000 tests/api.test.js
+                        """
+                    } else {
+                        echo "⚠️  Aucun script 'test' défini dans package.json — stage ignoré"
+                    }
+                }
+            }
+        }
+
+        // ── Stage 5 : Deploy ───────────────────────────────────
+        stage('Deploy') {
+            steps {
+                withCredentials([
+                    string(credentialsId: 'mongo-root-user',     variable: 'MONGO_ROOT_USER'),
+                    string(credentialsId: 'mongo-root-password', variable: 'MONGO_ROOT_PASSWORD'),
+                    string(credentialsId: 'mongo-db',            variable: 'MONGO_DB')
+                ]) {
+                    sh """
+                        docker compose -f ${COMPOSE_FILE} down --remove-orphans
+                        MONGO_ROOT_USER=\$MONGO_ROOT_USER \\
+                        MONGO_ROOT_PASSWORD=\$MONGO_ROOT_PASSWORD \\
+                        MONGO_DB=\$MONGO_DB \\
+                        docker compose -f ${COMPOSE_FILE} up --build -d
+                    """
+
+                    // Attente du health check MongoDB (12 tentatives × 10s = 120s max)
+                    sh '''
+                        echo "Attente du health check MongoDB..."
+                        for i in $(seq 1 12); do
+                            STATUS=$(docker inspect --format="{{.State.Health.Status}}" portfolio-mongodb 2>/dev/null || echo "absent")
+                            echo "Tentative $i/12 — MongoDB status: $STATUS"
+                            if [ "$STATUS" = "healthy" ]; then
+                                echo "✅ MongoDB est healthy"
+                                exit 0
+                            fi
+                            sleep 10
+                        done
+                        echo "❌ MongoDB n'est pas healthy après 120s"
+                        docker logs portfolio-mongodb --tail 50
+                        exit 1
+                    '''
+                }
+            }
+        }
+
+        // ── Stage 6 : Health Check ─────────────────────────────
+        stage('Health Check') {
+            steps {
+                script {
+                    def services = [
+                        [name: 'Backend',  url: 'http://localhost:3001/', container: 'portfolio-backend'],
+                        [name: 'Frontend', url: 'http://localhost:3000/', container: 'portfolio-frontend']
+                    ]
+                    services.each { svc ->
+                        def ok = false
+                        for (int i = 1; i <= 5; i++) {
+                            def status = sh(
+                                script: "curl -s -o /dev/null -w '%{http_code}' ${svc.url} || echo '000'",
+                                returnStdout: true
+                            ).trim()
+                            echo "${svc.name} — tentative ${i}/5 — HTTP ${status}"
+                            if (status == '200') {
+                                ok = true
+                                break
+                            }
+                            sleep 10
+                        }
+                        if (!ok) {
+                            sh "docker logs ${svc.container} --tail 50 || true"
+                            error("❌ ${svc.name} ne répond pas après 5 tentatives")
+                        }
+                        echo "✅ ${svc.name} opérationnel"
+                    }
+                }
+            }
+        }
+
+    }
+    // ══════════════════════════════════════════════════════════
+
+    // ── Post-actions ───────────────────────────────────────────
+    post {
+        success {
+            echo "✅ Pipeline SUCCESS — Build #${BUILD_NUMBER} (${GIT_SHORT ?: 'N/A'})"
+            echo "   Durée totale : ${currentBuild.durationString}"
+        }
+        failure {
+            echo "❌ Pipeline FAILURE — Build #${BUILD_NUMBER}"
+            echo "   Stage en échec : ${currentBuild.result}"
+            sh "docker compose -f ${COMPOSE_FILE} logs --tail 50 || true"
+        }
+        always {
+            sh "docker image prune -f || true"
+            cleanWs()
+        }
+    }
+
+}

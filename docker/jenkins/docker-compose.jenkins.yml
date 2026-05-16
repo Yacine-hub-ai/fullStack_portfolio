@@ -1,0 +1,21 @@
+services:
+
+  # ── Jenkins CI/CD ───────────────────────────────────────────
+  jenkins:
+    image: jenkins/jenkins:lts
+    container_name: portfolio-jenkins
+    restart: unless-stopped
+    user: root
+    ports:
+      - "8080:8080"    # Interface web Jenkins
+      - "50000:50000"  # Communication agents Jenkins
+    volumes:
+      - jenkins_home:/var/jenkins_home          # Persistance config, jobs, credentials
+      - /var/run/docker.sock:/var/run/docker.sock  # Accès au daemon Docker de l'hôte
+    environment:
+      - DOCKER_HOST=unix:///var/run/docker.sock
+
+# ── Volume persistant ────────────────────────────────────────
+volumes:
+  jenkins_home:
+    driver: local

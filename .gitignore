@@ -1,1 +1,12 @@
 projet-fil-rouge/
+
+# Jenkins
+docker/jenkins/secrets/
+*.log
+
+# Docker
+docker/.env
+**/node_modules/
+
+# macOS
+.DS_Store
