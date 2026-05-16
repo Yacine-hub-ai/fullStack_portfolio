@@ -114,15 +114,14 @@ pipeline {
         stage('Test') {
             steps {
                 script {
-                    def packageJson = readJSON file: 'docker/backend/package.json'
-                    if (packageJson.scripts?.test) {
+                    def packageContent = readFile('docker/backend/package.json')
+                    if (packageContent.contains('"test"')) {
                         echo "Lancement des tests backend..."
                         sh """
                             docker run --rm \\
                                 --name portfolio-test-${BUILD_NUMBER} \\
                                 --network portfolio-net \\
                                 -e API_URL=http://portfolio-backend:3001 \\
-                                --build-arg NODE_ENV=test \\
                                 ${BACKEND_IMAGE}:latest \\
                                 node --test --test-timeout=15000 tests/api.test.js
                         """
