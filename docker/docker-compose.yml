@@ -44,7 +44,7 @@ services:
   # ── Frontend Nginx ──────────────────────────────────────────
   frontend:
     build:
-      context: ..                    # dossier Express_mongo (contient index.html)
+      context: ..
       dockerfile: docker/frontend/Dockerfile
     container_name: portfolio-frontend
     restart: unless-stopped
