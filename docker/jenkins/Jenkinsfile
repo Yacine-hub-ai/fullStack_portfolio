@@ -110,29 +110,7 @@ pipeline {
             }
         }
 
-        // ── Stage 4 : Test ─────────────────────────────────────
-        stage('Test') {
-            steps {
-                script {
-                    def packageContent = readFile('docker/backend/package.json')
-                    if (packageContent.contains('"test"')) {
-                        echo "Lancement des tests backend..."
-                        sh """
-                            docker run --rm \\
-                                --name portfolio-test-${BUILD_NUMBER} \\
-                                --network portfolio-net \\
-                                -e API_URL=http://portfolio-backend:3001 \\
-                                ${BACKEND_IMAGE}:latest \\
-                                node --test --test-timeout=15000 tests/api.test.js
-                        """
-                    } else {
-                        echo "⚠️  Aucun script 'test' défini dans package.json — stage ignoré"
-                    }
-                }
-            }
-        }
-
-        // ── Stage 5 : Deploy ───────────────────────────────────
+        // ── Stage 4 : Deploy ───────────────────────────────────
         stage('Deploy') {
             steps {
                 withCredentials([
@@ -164,6 +142,28 @@ pipeline {
                         docker logs portfolio-mongodb --tail 50
                         exit 1
                     '''
+                }
+            }
+        }
+
+        // ── Stage 5 : Test ─────────────────────────────────────
+        stage('Test') {
+            steps {
+                script {
+                    def packageContent = readFile('docker/backend/package.json')
+                    if (packageContent.contains('"test"')) {
+                        echo "Lancement des tests backend..."
+                        sh """
+                            docker run --rm \\
+                                --name portfolio-test-${BUILD_NUMBER} \\
+                                --network portfolio-net \\
+                                -e API_URL=http://portfolio-backend:3001 \\
+                                ${BACKEND_IMAGE}:latest \\
+                                node --test --test-timeout=15000 tests/api.test.js
+                        """
+                    } else {
+                        echo "⚠️  Aucun script 'test' défini dans package.json — stage ignoré"
+                    }
                 }
             }
         }
