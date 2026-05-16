@@ -158,8 +158,8 @@ pipeline {
                         sh """
                             docker run --rm \\
                                 --name portfolio-test-${BUILD_NUMBER} \\
-                                --network portfolio-net \\
-                                -e API_URL=http://portfolio-backend:3001 \\
+                                --add-host=host.docker.internal:host-gateway \\
+                                -e API_URL=http://host.docker.internal:3001 \\
                                 ${BACKEND_IMAGE}:latest \\
                                 node --test --test-timeout=15000 tests/api.test.js
                         """
