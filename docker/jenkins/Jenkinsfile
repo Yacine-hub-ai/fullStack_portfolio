@@ -6,7 +6,7 @@ pipeline {
     environment {
         BACKEND_IMAGE  = 'portfolio-backend'
         FRONTEND_IMAGE = 'portfolio-frontend'
-        COMPOSE_FILE   = 'docker/docker-compose.yml'
+        COMPOSE_FILE   = "docker/docker-compose.yml"
         DOCKERHUB_USER = 'cineya'   // ← ton username Docker Hub
         REPO_URL       = 'https://github.com/Yacine-hub-ai/fullStack_portfolio.git'
     }
@@ -119,11 +119,13 @@ pipeline {
                     string(credentialsId: 'mongo-db',            variable: 'MONGO_DB')
                 ]) {
                     sh """
-                        docker compose -f ${COMPOSE_FILE} down --remove-orphans
+                        echo "Workspace: ${WORKSPACE}"
+                        ls ${WORKSPACE}/docker/
+                        docker compose -f ${WORKSPACE}/${COMPOSE_FILE} down --remove-orphans
                         MONGO_ROOT_USER=\$MONGO_ROOT_USER \\
                         MONGO_ROOT_PASSWORD=\$MONGO_ROOT_PASSWORD \\
                         MONGO_DB=\$MONGO_DB \\
-                        docker compose -f ${COMPOSE_FILE} up --build -d
+                        docker compose -f ${WORKSPACE}/${COMPOSE_FILE} up --build -d
                     """
 
                     // Attente du health check MongoDB (12 tentatives × 10s = 120s max)
@@ -212,7 +214,7 @@ pipeline {
         failure {
             echo "❌ Pipeline FAILURE — Build #${BUILD_NUMBER}"
             echo "   Stage en échec : ${currentBuild.result}"
-            sh "docker compose -f ${COMPOSE_FILE} logs --tail 50 || true"
+            sh "docker compose -f ${WORKSPACE}/${COMPOSE_FILE} logs --tail 50 || true"
         }
         always {
             sh "docker image prune -f || true"
