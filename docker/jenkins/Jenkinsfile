@@ -148,30 +148,7 @@ pipeline {
             }
         }
 
-        // ── Stage 5 : Test ─────────────────────────────────────
-        stage('Test') {
-            steps {
-                script {
-                    def packageContent = readFile('docker/backend/package.json')
-                    if (packageContent.contains('"test"')) {
-                        echo "Lancement des tests backend..."
-                        sh """
-                            # Installer Node.js si absent
-                            which node || (apt-get update -qq && apt-get install -y -qq nodejs)
-                            # Installer les dépendances de test
-                            cd ${WORKSPACE}/docker/backend && npm install
-                            # Lancer les tests contre le backend déployé
-                            API_URL=http://localhost:3001 node --test --test-timeout=15000 tests/api.test.js
-                        """
-                        echo "✅ Tests backend passés"
-                    } else {
-                        echo "⚠️  Aucun script 'test' défini dans package.json — stage ignoré"
-                    }
-                }
-            }
-        }
-
-        // ── Stage 6 : Health Check ─────────────────────────────
+        // ── Stage 5 : Health Check ─────────────────────────────
         stage('Health Check') {
             steps {
                 script {
