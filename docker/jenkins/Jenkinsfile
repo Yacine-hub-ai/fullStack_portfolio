@@ -151,8 +151,8 @@ pipeline {
             steps {
                 script {
                     def services = [
-                        [name: 'Backend',  url: 'http://localhost:3001/', container: 'portfolio-backend'],
-                        [name: 'Frontend', url: 'http://localhost:3000/', container: 'portfolio-frontend']
+                        [name: 'Backend',  url: 'http://host.docker.internal:3001/', container: 'portfolio-backend'],
+                        [name: 'Frontend', url: 'http://host.docker.internal:3000/', container: 'portfolio-frontend']
                     ]
                     services.each { svc ->
                         def ok = false
