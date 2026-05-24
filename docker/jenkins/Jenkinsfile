@@ -186,11 +186,36 @@ pipeline {
         success {
             echo "✅ Pipeline SUCCESS — Build #${BUILD_NUMBER} (${GIT_SHORT ?: 'N/A'})"
             echo "   Durée totale : ${currentBuild.durationString}"
+            emailext(
+                to: 'nyacine183@gmail.com',
+                subject: "✅ [Jenkins] portfolio-pipeline #${BUILD_NUMBER} — SUCCESS",
+                body: """Build #${BUILD_NUMBER} terminé avec succès.
+
+Commit  : ${GIT_SHORT ?: 'N/A'}
+Branche : ${env.BRANCH_NAME ?: 'main'}
+Durée   : ${currentBuild.durationString}
+
+Images Docker Hub :
+  - cineya/portfolio-backend:${BUILD_NUMBER}-${GIT_SHORT ?: 'N/A'}
+  - cineya/portfolio-frontend:${BUILD_NUMBER}-${GIT_SHORT ?: 'N/A'}
+
+Voir le build : ${env.BUILD_URL}"""
+            )
         }
         failure {
             echo "❌ Pipeline FAILURE — Build #${BUILD_NUMBER}"
             echo "   Stage en échec : ${currentBuild.result}"
-            sh "docker compose -f ${WORKSPACE}/${COMPOSE_FILE} logs --tail 50 || true"
+            sh "docker compose -f ${WORKSPACE}/docker/docker-compose.yml logs --tail 50 || true"
+            emailext(
+                to: 'nyacine183@gmail.com',
+                subject: "❌ [Jenkins] portfolio-pipeline #${BUILD_NUMBER} — FAILURE",
+                body: """Build #${BUILD_NUMBER} a échoué.
+
+Commit  : ${GIT_SHORT ?: 'N/A'}
+Branche : ${env.BRANCH_NAME ?: 'main'}
+
+Voir les logs : ${env.BUILD_URL}console"""
+            )
         }
         always {
             sh "docker image prune -f || true"
