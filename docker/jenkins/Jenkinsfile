@@ -116,16 +116,14 @@ pipeline {
                 withCredentials([
                     string(credentialsId: 'mongo-root-user',     variable: 'MONGO_ROOT_USER'),
                     string(credentialsId: 'mongo-root-password', variable: 'MONGO_ROOT_PASSWORD'),
-                    string(credentialsId: 'mongo-db',            variable: 'MONGO_DB')
+                    string(credentialsId: 'mongo-db',            variable: 'MONGO_DB_NAME')
                 ]) {
                     sh """
-                        echo "Workspace: ${WORKSPACE}"
-                        ls ${WORKSPACE}/docker/
-                        docker compose -f ${WORKSPACE}/${COMPOSE_FILE} down --remove-orphans
+                        docker compose -f ${WORKSPACE}/docker/docker-compose.yml down --remove-orphans
                         MONGO_ROOT_USER=\$MONGO_ROOT_USER \\
                         MONGO_ROOT_PASSWORD=\$MONGO_ROOT_PASSWORD \\
-                        MONGO_DB=\$MONGO_DB \\
-                        docker compose -f ${WORKSPACE}/${COMPOSE_FILE} up --build -d
+                        MONGO_DB=\$MONGO_DB_NAME \\
+                        docker compose -f ${WORKSPACE}/docker/docker-compose.yml up --build -d
                     """
 
                     // Attente du health check MongoDB (12 tentatives × 10s = 120s max)
@@ -135,12 +133,12 @@ pipeline {
                             STATUS=$(docker inspect --format="{{.State.Health.Status}}" portfolio-mongodb 2>/dev/null || echo "absent")
                             echo "Tentative $i/12 — MongoDB status: $STATUS"
                             if [ "$STATUS" = "healthy" ]; then
-                                echo "✅ MongoDB est healthy"
+                                echo "MongoDB est healthy"
                                 exit 0
                             fi
                             sleep 10
                         done
-                        echo "❌ MongoDB n'est pas healthy après 120s"
+                        echo "MongoDB n'est pas healthy apres 120s"
                         docker logs portfolio-mongodb --tail 50
                         exit 1
                     '''
