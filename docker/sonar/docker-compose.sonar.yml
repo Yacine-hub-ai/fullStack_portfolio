@@ -1,0 +1,57 @@
+services:
+
+  # ── SonarQube ───────────────────────────────────────────────
+  sonarqube:
+    image: sonarqube:10-community
+    container_name: portfolio-sonarqube
+    restart: unless-stopped
+    ports:
+      - "9000:9000"    # Interface web SonarQube
+    environment:
+      - SONAR_JDBC_URL=jdbc:postgresql://sonar-db:5432/sonar
+      - SONAR_JDBC_USERNAME=sonar
+      - SONAR_JDBC_PASSWORD=sonar
+    volumes:
+      - sonar_data:/opt/sonarqube/data
+      - sonar_extensions:/opt/sonarqube/extensions
+      - sonar_logs:/opt/sonarqube/logs
+    depends_on:
+      sonar-db:
+        condition: service_healthy
+    networks:
+      - sonar-net
+    ulimits:
+      nofile:
+        soft: 65536
+        hard: 65536
+
+  # ── Base de données PostgreSQL pour SonarQube ───────────────
+  sonar-db:
+    image: postgres:15-alpine
+    container_name: portfolio-sonar-db
+    restart: unless-stopped
+    environment:
+      - POSTGRES_USER=sonar
+      - POSTGRES_PASSWORD=sonar
+      - POSTGRES_DB=sonar
+    volumes:
+      - sonar_db_data:/var/lib/postgresql/data
+    networks:
+      - sonar-net
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U sonar"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+# ── Volumes ──────────────────────────────────────────────────
+volumes:
+  sonar_data:
+  sonar_extensions:
+  sonar_logs:
+  sonar_db_data:
+
+# ── Réseau ───────────────────────────────────────────────────
+networks:
+  sonar-net:
+    driver: bridge
