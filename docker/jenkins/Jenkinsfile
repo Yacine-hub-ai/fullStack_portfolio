@@ -80,7 +80,22 @@ pipeline {
             }
         }
 
-        // ── Stage 3 : Push vers Docker Hub ─────────────────────
+        // ── Stage 3 : SonarQube Analysis ───────────────────────
+        stage('SonarQube Analysis') {
+            steps {
+                withSonarQubeEnv('SonarQube') {
+                    sh """
+                        ${tool 'SonarScanner'}/bin/sonar-scanner \
+                            -Dsonar.projectKey=portfolio-fullstack \
+                            -Dsonar.sources=Express_mongo,docker/backend \
+                            -Dsonar.exclusions=**/node_modules/**,**/*.test.js \
+                            -Dsonar.host.url=http://host.docker.internal:9000
+                    """
+                }
+            }
+        }
+
+        // ── Stage 4 : Push vers Docker Hub ─────────────────────
         stage('Push to Docker Hub') {
             steps {
                 withCredentials([usernamePassword(
