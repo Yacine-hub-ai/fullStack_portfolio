@@ -205,7 +205,10 @@
 // Ainsi, que vous accédiez via localhost ou via l'IP LAN
 // (ex: 192.168.x.x), les requêtes atteignent toujours le bon serveur.
 // ──────────────────────────────────────────────────────────────
-const API_BASE = window.location.protocol + '//' + window.location.hostname + ':3001/api';
+const isKubernetes = !['localhost', '127.0.0.1'].includes(window.location.hostname) && !window.location.hostname.match(/^192\.168\.|^10\.|^172\./);
+const API_BASE = isKubernetes
+  ? window.location.protocol + '//' + window.location.hostname + '/api'
+  : window.location.protocol + '//' + window.location.hostname + ':3001/api';
 
 // Normalise un projet MongoDB (_id → id) pour que le reste du code
 // fonctionne de la même façon qu'avec localStorage
@@ -219,7 +222,10 @@ const Api = {
   // Appelé au démarrage — vérifie que l'API répond
   async init() {
     try {
-      const r = await fetch(window.location.protocol + '//' + window.location.hostname + ':3001/');
+      const url = isKubernetes
+        ? window.location.protocol + '//' + window.location.hostname + '/api'
+        : window.location.protocol + '//' + window.location.hostname + ':3001/';
+      const r = await fetch(url);
       const data = await r.json();
       updateApiStatus(data.succes === true);
     } catch {

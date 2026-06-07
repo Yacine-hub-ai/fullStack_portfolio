@@ -23,8 +23,6 @@ spec:
               value: "3001"
             - name: NODE_ENV
               value: production
-            - name: MONGO_URI
-              value: mongodb://$(MONGO_ROOT_USER):$(MONGO_ROOT_PASSWORD)@mongodb:27017/$(MONGO_DB)?authSource=admin
             - name: MONGO_ROOT_USER
               valueFrom:
                 secretKeyRef:
@@ -40,6 +38,11 @@ spec:
                 secretKeyRef:
                   name: mongo-secret
                   key: MONGO_DB
+            - name: MONGO_URI
+              valueFrom:
+                secretKeyRef:
+                  name: mongo-secret
+                  key: MONGO_URI
 ---
 apiVersion: v1
 kind: Service

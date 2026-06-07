@@ -1,5 +1,6 @@
 import dotenv from 'dotenv'
-dotenv.config()
+// override: false — les variables d'environnement système (Kubernetes) ont la priorité sur le .env
+dotenv.config({ override: false })
 
 import express from 'express'
 import cors from 'cors'
