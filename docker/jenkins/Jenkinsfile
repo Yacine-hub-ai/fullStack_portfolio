@@ -125,7 +125,21 @@ pipeline {
             }
         }
 
-        // ── Stage 4 : Deploy ───────────────────────────────────
+        // ── Stage 4 : Deploy to Kubernetes ────────────────────
+        stage('Deploy to Kubernetes') {
+            steps {
+                sh """
+                    export KUBECONFIG=/var/jenkins_home/.kube/config
+                    kubectl rollout restart deployment/backend -n portfolio
+                    kubectl rollout restart deployment/frontend -n portfolio
+                    kubectl rollout status deployment/backend -n portfolio --timeout=120s
+                    kubectl rollout status deployment/frontend -n portfolio --timeout=120s
+                """
+                echo "✅ Déploiement Kubernetes terminé"
+            }
+        }
+
+        // ── Stage 5 : Deploy Docker Compose ───────────────────
         stage('Deploy') {
             steps {
                 withCredentials([

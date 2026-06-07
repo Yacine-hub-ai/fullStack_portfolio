@@ -1,4 +1,4 @@
-# Image Jenkins avec Docker CLI intégré
+# Image Jenkins avec Docker CLI + kubectl intégrés
 FROM jenkins/jenkins:lts
 
 USER root
@@ -14,5 +14,10 @@ RUN apt-get update -qq && \
     apt-get update -qq && \
     apt-get install -y -qq docker-ce-cli docker-compose-plugin && \
     apt-get clean && rm -rf /var/lib/apt/lists/*
+
+# Installer kubectl
+RUN curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl" && \
+    install -o root -g root -m 0755 kubectl /usr/local/bin/kubectl && \
+    rm kubectl
 
 USER jenkins
