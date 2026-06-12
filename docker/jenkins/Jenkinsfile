@@ -86,16 +86,22 @@ pipeline {
                 withSonarQubeEnv('SonarQube') {
                     sh """
                         ${tool 'SonarScanner'}/bin/sonar-scanner \
-                            -Dsonar.projectKey=portfolio-fullstack \
-                            -Dsonar.sources=Express_mongo,docker/backend \
-                            -Dsonar.exclusions=**/node_modules/**,**/*.test.js \
                             -Dsonar.host.url=http://host.docker.internal:9000
                     """
                 }
             }
         }
 
-        // ── Stage 4 : Push vers Docker Hub ─────────────────────
+        // ── Stage 4 : Quality Gate ─────────────────────────────
+        stage('Quality Gate') {
+            steps {
+                timeout(time: 5, unit: 'MINUTES') {
+                    waitForQualityGate abortPipeline: true
+                }
+            }
+        }
+
+        // ── Stage 5 : Push vers Docker Hub ─────────────────────
         stage('Push to Docker Hub') {
             steps {
                 withCredentials([usernamePassword(
@@ -125,21 +131,7 @@ pipeline {
             }
         }
 
-        // ── Stage 4 : Deploy to Kubernetes ────────────────────
-        stage('Deploy to Kubernetes') {
-            steps {
-                sh """
-                    export KUBECONFIG=/var/jenkins_home/.kube/config
-                    kubectl rollout restart deployment/backend -n portfolio
-                    kubectl rollout restart deployment/frontend -n portfolio
-                    kubectl rollout status deployment/backend -n portfolio --timeout=120s
-                    kubectl rollout status deployment/frontend -n portfolio --timeout=120s
-                """
-                echo "✅ Déploiement Kubernetes terminé"
-            }
-        }
-
-        // ── Stage 5 : Deploy Docker Compose ───────────────────
+        // ── Stage 5 : Push vers Docker Hub ─────────────────────
         stage('Deploy') {
             steps {
                 withCredentials([
