@@ -1,0 +1,15 @@
+kubeconfig_path      = "~/.kube/config"
+kube_context         = ""
+namespace            = "portfolio"
+frontend_image       = "cineya/portfolio-frontend:latest"
+backend_image        = "cineya/portfolio-backend:latest"
+mongodb_image        = "mongo:7.0"
+frontend_replicas    = 1
+backend_replicas     = 1
+frontend_node_port   = 30080
+mongo_root_user      = "admin"
+mongo_root_password  = "ChangeMe123"
+mongo_database       = "portfolio"
+mongo_storage_size   = "1Gi"
+ingress_host         = "portfolio.local"
+ingress_class_name   = "nginx"
