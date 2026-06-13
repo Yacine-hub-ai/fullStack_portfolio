@@ -25,7 +25,7 @@ variable "public_subnet_cidr" {
 variable "instance_type" {
   description = "Type de l'instance EC2 de demonstration."
   type        = string
-  default     = "t2.micro"
+  default     = "t3.micro"
 }
 
 variable "ssh_cidr" {
