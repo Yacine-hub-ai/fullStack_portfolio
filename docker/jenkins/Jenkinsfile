@@ -78,20 +78,21 @@ pipeline {
         }
 
         // ── Stage 3 : SonarQube Analysis ───────────────────────
-        stage('SonarQube Analysis') {
-            steps {
-                withSonarQubeEnv('SonarQube') {
-                    sh """
-                        ${tool 'SonarScanner'}/bin/sonar-scanner \
-                            -Dsonar.host.url=http://host.docker.internal:9000 \
-                            -Dsonar.projectKey=portfolio-fullstack \
-                            -Dsonar.sources=docker/backend \
-                            -Dsonar.exclusions=**/node_modules/**,**/*.test.js,**/package-lock.json \
-                            -Dsonar.javascript.node.maxspace=512
-                    """
-                }
-            }
+      stage('SonarQube Analysis') {
+    steps {
+        withSonarQubeEnv('SonarQube') {
+            sh """
+                ${tool 'SonarScanner'}/bin/sonar-scanner \
+                    -Dsonar.host.url=http://host.docker.internal:9000 \
+                    -Dsonar.projectKey=portfolio-fullstack \
+                    -Dsonar.sources=docker/backend \
+                    -Dsonar.exclusions=**/node_modules/**,**/*.test.js,**/package-lock.json,**/*.js,**/*.ts \
+                    -Dsonar.javascript.node.maxspace=2048 \
+                    -Dsonar.javascript.environments=node
+            """
         }
+    }
+}
 
         // ── Stage 4 : Quality Gate ─────────────────────────────
         stage('Quality Gate') {

@@ -32,6 +32,10 @@ services:
     extra_hosts:
       - "host.docker.internal:host-gateway"
 
+    # ✅ Mémoire augmentée pour SonarQube bridge Node.js
+    mem_limit: 4g
+    mem_reservation: 2g
+
 # ── Volume persistant ────────────────────────────────────────
 volumes:
   jenkins_home:
