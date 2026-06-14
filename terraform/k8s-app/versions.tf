@@ -10,6 +10,6 @@ terraform {
 }
 
 provider "kubernetes" {
-  config_path    = pathexpand(var.kubeconfig_path)
-  config_context = var.kube_context == "" ? null : var.kube_context
+  config_path    = var.kubeconfig_path  // reçoit /var/jenkins_home/.kube/config
+  config_context = var.kube_context     // reçoit "minikube"
 }

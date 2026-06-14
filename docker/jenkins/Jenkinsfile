@@ -7,23 +7,23 @@ pipeline {
         BACKEND_IMAGE  = 'portfolio-backend'
         FRONTEND_IMAGE = 'portfolio-frontend'
         COMPOSE_FILE   = "docker/docker-compose.yml"
-        DOCKERHUB_USER = 'cineya'   // ← ton username Docker Hub
+        TERRAFORM_DIR  = 'terraform/k8s-app'
+        // ✅ KUBECONFIG pointe vers le fichier patché monté dans Jenkins
+        KUBECONFIG     = '/var/jenkins_home/.kube/config'
+        DOCKERHUB_USER = 'cineya'
         REPO_URL       = 'https://github.com/Yacine-hub-ai/fullStack_portfolio.git'
     }
 
-    // ── Options globales ───────────────────────────────────────
     options {
         buildDiscarder(logRotator(numToKeepStr: '10'))
         timeout(time: 30, unit: 'MINUTES')
         timestamps()
     }
 
-    // ── Déclenchement automatique via webhook GitHub ───────────
     triggers {
         githubPush()
     }
 
-    // ══════════════════════════════════════════════════════════
     stages {
 
         // ── Stage 1 : Checkout ─────────────────────────────────
@@ -44,11 +44,10 @@ pipeline {
                     ).trim()
                 }
                 echo "✅ Checkout — branche: ${env.BRANCH_NAME ?: 'main'} | commit: ${env.GIT_SHORT}"
-                echo "   Déclenchement : ${currentBuild.getBuildCauses()[0]?.shortDescription ?: 'Manuel'}"
             }
         }
 
-        // ── Stage 2 : Build (backend + frontend en parallèle) ──
+        // ── Stage 2 : Build ────────────────────────────────────
         stage('Build') {
             parallel {
 
@@ -60,7 +59,6 @@ pipeline {
                                 -t ${BACKEND_IMAGE}:${BUILD_NUMBER}-${GIT_SHORT} \\
                                 -t ${BACKEND_IMAGE}:latest \\
                                 docker/backend/
-                            echo "Backend image size: \$(docker image inspect ${BACKEND_IMAGE}:latest --format='{{.Size}}') bytes"
                         """
                     }
                 }
@@ -73,7 +71,6 @@ pipeline {
                                 -t ${FRONTEND_IMAGE}:latest \\
                                 -f docker/frontend/Dockerfile \\
                                 .
-                            echo "Frontend image size: \$(docker image inspect ${FRONTEND_IMAGE}:latest --format='{{.Size}}') bytes"
                         """
                     }
                 }
@@ -89,7 +86,7 @@ pipeline {
                             -Dsonar.host.url=http://host.docker.internal:9000 \
                             -Dsonar.projectKey=portfolio-fullstack \
                             -Dsonar.sources=docker/backend \
-                            -Dsonar.exclusions=**/node_modules/**,**/*.test.js,**/*.js,**/*.ts,**/package-lock.json \
+                            -Dsonar.exclusions=**/node_modules/**,**/*.test.js,**/package-lock.json \
                             -Dsonar.javascript.node.maxspace=512
                     """
                 }
@@ -116,13 +113,11 @@ pipeline {
                     sh """
                         echo \$DOCKERHUB_PASSWORD | docker login -u \$DOCKERHUB_LOGIN --password-stdin
 
-                        # Taguer et pousser le backend
                         docker tag ${BACKEND_IMAGE}:latest \$DOCKERHUB_LOGIN/${BACKEND_IMAGE}:${BUILD_NUMBER}-${GIT_SHORT}
                         docker tag ${BACKEND_IMAGE}:latest \$DOCKERHUB_LOGIN/${BACKEND_IMAGE}:latest
                         docker push \$DOCKERHUB_LOGIN/${BACKEND_IMAGE}:${BUILD_NUMBER}-${GIT_SHORT}
                         docker push \$DOCKERHUB_LOGIN/${BACKEND_IMAGE}:latest
 
-                        # Taguer et pousser le frontend
                         docker tag ${FRONTEND_IMAGE}:latest \$DOCKERHUB_LOGIN/${FRONTEND_IMAGE}:${BUILD_NUMBER}-${GIT_SHORT}
                         docker tag ${FRONTEND_IMAGE}:latest \$DOCKERHUB_LOGIN/${FRONTEND_IMAGE}:latest
                         docker push \$DOCKERHUB_LOGIN/${FRONTEND_IMAGE}:${BUILD_NUMBER}-${GIT_SHORT}
@@ -131,12 +126,12 @@ pipeline {
                         docker logout
                     """
                 }
-                echo "✅ Images poussées vers Docker Hub — tags: latest + ${BUILD_NUMBER}-${GIT_SHORT}"
+                echo "✅ Images poussées — tags: latest + ${BUILD_NUMBER}-${GIT_SHORT}"
             }
         }
 
-        // ── Stage 5 : Push vers Docker Hub ─────────────────────
-        stage('Deploy') {
+        // ── Stage 6 : Déploiement Kubernetes avec Terraform ────
+        stage('Deploy with Terraform') {
             steps {
                 withCredentials([
                     string(credentialsId: 'mongo-root-user',     variable: 'MONGO_ROOT_USER'),
@@ -144,73 +139,73 @@ pipeline {
                     string(credentialsId: 'mongo-db',            variable: 'MONGO_DB_NAME')
                 ]) {
                     sh """
-                        docker compose -f ${WORKSPACE}/docker/docker-compose.yml down --remove-orphans
-                        MONGO_ROOT_USER=\$MONGO_ROOT_USER \\
-                        MONGO_ROOT_PASSWORD=\$MONGO_ROOT_PASSWORD \\
-                        MONGO_DB=\$MONGO_DB_NAME \\
-                        docker compose -f ${WORKSPACE}/docker/docker-compose.yml up --build -d
-                    """
+                        # ── Vérifier que kubectl fonctionne ──
+                        echo "🔍 Vérification connexion Kubernetes..."
+                        kubectl get nodes
+                        echo "✅ Connexion Kubernetes OK"
 
-                    // Attente du health check MongoDB (12 tentatives × 10s = 120s max)
-                    sh '''
-                        echo "Attente du health check MongoDB..."
-                        for i in $(seq 1 12); do
-                            STATUS=$(docker inspect --format="{{.State.Health.Status}}" portfolio-mongodb 2>/dev/null || echo "absent")
-                            echo "Tentative $i/12 — MongoDB status: $STATUS"
-                            if [ "$STATUS" = "healthy" ]; then
-                                echo "MongoDB est healthy"
-                                exit 0
-                            fi
-                            sleep 10
-                        done
-                        echo "MongoDB n'est pas healthy apres 120s"
-                        docker logs portfolio-mongodb --tail 50
-                        exit 1
-                    '''
+                        # ── Initialiser Terraform ──
+                        cd ${WORKSPACE}/${TERRAFORM_DIR}
+
+                        # ✅ TF_CLI_ARGS_init force le bon kubeconfig
+                        export KUBECONFIG=${KUBECONFIG}
+
+                        terraform init -input=false -upgrade
+
+                        terraform fmt -check || true
+                        terraform validate
+
+                        # ── Supprimer le namespace si existant ──
+                        kubectl delete namespace portfolio --ignore-not-found=true
+                        if kubectl get namespace portfolio >/dev/null 2>&1; then
+                            echo "⏳ Attente suppression namespace..."
+                            kubectl wait --for=delete namespace/portfolio --timeout=180s
+                        fi
+                        echo "✅ Namespace prêt"
+
+                        # ── Appliquer le plan Terraform ──
+                        terraform apply -auto-approve \\
+                            -var="kubeconfig_path=${KUBECONFIG}" \\
+                            -var="kube_context=minikube" \\
+                            -var="frontend_image=${DOCKERHUB_USER}/${FRONTEND_IMAGE}:${BUILD_NUMBER}-${GIT_SHORT}" \\
+                            -var="backend_image=${DOCKERHUB_USER}/${BACKEND_IMAGE}:${BUILD_NUMBER}-${GIT_SHORT}" \\
+                            -var="mongo_root_user=\$MONGO_ROOT_USER" \\
+                            -var="mongo_root_password=\$MONGO_ROOT_PASSWORD" \\
+                            -var="mongo_database=\$MONGO_DB_NAME"
+
+                        echo "✅ Terraform apply terminé"
+                    """
                 }
             }
         }
 
-        // ── Stage 5 : Health Check ─────────────────────────────
-        stage('Health Check') {
+        // ── Stage 7 : Health Check Kubernetes ──────────────────
+        stage('Kubernetes Health Check') {
             steps {
-                script {
-                    def services = [
-                        [name: 'Backend',  url: 'http://host.docker.internal:3001/', container: 'portfolio-backend'],
-                        [name: 'Frontend', url: 'http://host.docker.internal:3000/', container: 'portfolio-frontend']
-                    ]
-                    services.each { svc ->
-                        def ok = false
-                        for (int i = 1; i <= 5; i++) {
-                            def status = sh(
-                                script: "curl -s -o /dev/null -w '%{http_code}' ${svc.url} || echo '000'",
-                                returnStdout: true
-                            ).trim()
-                            echo "${svc.name} — tentative ${i}/5 — HTTP ${status}"
-                            if (status == '200') {
-                                ok = true
-                                break
-                            }
-                            sleep 10
-                        }
-                        if (!ok) {
-                            sh "docker logs ${svc.container} --tail 50 || true"
-                            error("❌ ${svc.name} ne répond pas après 5 tentatives")
-                        }
-                        echo "✅ ${svc.name} opérationnel"
-                    }
-                }
+                sh """
+                    echo "⏳ Attente déploiements..."
+                    kubectl rollout status deployment/frontend  -n portfolio --timeout=180s
+                    kubectl rollout status deployment/backend   -n portfolio --timeout=180s
+                    kubectl rollout status statefulset/mongodb  -n portfolio --timeout=180s
+
+                    echo ""
+                    echo "📦 Ressources Kubernetes :"
+                    kubectl get all -n portfolio
+                    echo ""
+                    echo "🌐 Ingress :"
+                    kubectl get ingress -n portfolio
+                    echo ""
+                    echo "✅ Application déployée avec succès !"
+                """
             }
         }
 
     }
-    // ══════════════════════════════════════════════════════════
 
     // ── Post-actions ───────────────────────────────────────────
     post {
         success {
             echo "✅ Pipeline SUCCESS — Build #${BUILD_NUMBER} (${GIT_SHORT ?: 'N/A'})"
-            echo "   Durée totale : ${currentBuild.durationString}"
             emailext(
                 to: 'nyacine183@gmail.com',
                 subject: "✅ [Jenkins] portfolio-pipeline #${BUILD_NUMBER} — SUCCESS",
@@ -229,8 +224,8 @@ Voir le build : ${env.BUILD_URL}"""
         }
         failure {
             echo "❌ Pipeline FAILURE — Build #${BUILD_NUMBER}"
-            echo "   Stage en échec : ${currentBuild.result}"
-            sh "docker compose -f ${WORKSPACE}/docker/docker-compose.yml logs --tail 50 || true"
+            sh "kubectl get pods -n portfolio || true"
+            sh "kubectl describe pods -n portfolio || true"
             emailext(
                 to: 'nyacine183@gmail.com',
                 subject: "❌ [Jenkins] portfolio-pipeline #${BUILD_NUMBER} — FAILURE",
