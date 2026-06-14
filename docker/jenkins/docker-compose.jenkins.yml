@@ -11,12 +11,26 @@ services:
     ports:
       - "8080:8080"    # Interface web Jenkins
       - "50000:50000"  # Communication agents Jenkins
+
     volumes:
-      - jenkins_home:/var/jenkins_home          # Persistance config, jobs, credentials
-      - /var/run/docker.sock:/var/run/docker.sock  # Accès au daemon Docker de l'hôte
-      - ~/.kube:/var/jenkins_home/.kube:ro         # Accès au cluster Minikube
+      - jenkins_home:/var/jenkins_home
+      - /var/run/docker.sock:/var/run/docker.sock
+
+      # ✅ kubeconfig PATCHÉ (127.0.0.1 → IP réelle du Mac)
+      - ./secrets/kube:/var/jenkins_home/.kube:ro
+
+      # ✅ Certificats Minikube montés depuis le Mac
+      - ~/.minikube/ca.crt:/root/.minikube/ca.crt:ro
+      - ~/.minikube/profiles/minikube/client.crt:/root/.minikube/profiles/minikube/client.crt:ro
+      - ~/.minikube/profiles/minikube/client.key:/root/.minikube/profiles/minikube/client.key:ro
+
     environment:
       - DOCKER_HOST=unix:///var/run/docker.sock
+      - KUBECONFIG=/var/jenkins_home/.kube/config
+
+    # ✅ Permet au conteneur de joindre host.docker.internal
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
 
 # ── Volume persistant ────────────────────────────────────────
 volumes:
