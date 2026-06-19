@@ -1,0 +1,242 @@
+{
+  "title": "Infrastructure — Système",
+  "uid": "portfolio-infra",
+  "schemaVersion": 38,
+  "version": 1,
+  "refresh": "30s",
+  "time": { "from": "now-1h", "to": "now" },
+  "tags": ["portfolio", "infrastructure"],
+  "panels": [
+
+    {
+      "id": 1,
+      "title": "CPU — Utilisation globale (%)",
+      "type": "stat",
+      "gridPos": { "x": 0, "y": 0, "w": 6, "h": 4 },
+      "targets": [{
+        "expr": "100 - (avg(rate(node_cpu_seconds_total{mode=\"idle\"}[5m])) * 100)",
+        "legendFormat": "CPU %"
+      }],
+      "options": {
+        "reduceOptions": { "calcs": ["lastNotNull"] },
+        "colorMode": "background",
+        "orientation": "auto"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percent",
+          "min": 0, "max": 100,
+          "color": { "mode": "thresholds" },
+          "thresholds": { "steps": [
+            { "value": null, "color": "green" },
+            { "value": 70,   "color": "yellow" },
+            { "value": 85,   "color": "red" }
+          ]}
+        }
+      }
+    },
+
+    {
+      "id": 2,
+      "title": "RAM — Utilisation (%)",
+      "type": "stat",
+      "gridPos": { "x": 6, "y": 0, "w": 6, "h": 4 },
+      "targets": [{
+        "expr": "(1 - (node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes)) * 100",
+        "legendFormat": "RAM %"
+      }],
+      "options": {
+        "reduceOptions": { "calcs": ["lastNotNull"] },
+        "colorMode": "background"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percent",
+          "min": 0, "max": 100,
+          "color": { "mode": "thresholds" },
+          "thresholds": { "steps": [
+            { "value": null, "color": "green" },
+            { "value": 70,   "color": "yellow" },
+            { "value": 85,   "color": "red" }
+          ]}
+        }
+      }
+    },
+
+    {
+      "id": 3,
+      "title": "RAM — Disponible",
+      "type": "stat",
+      "gridPos": { "x": 12, "y": 0, "w": 6, "h": 4 },
+      "targets": [{
+        "expr": "node_memory_MemAvailable_bytes",
+        "legendFormat": "Disponible"
+      }],
+      "options": {
+        "reduceOptions": { "calcs": ["lastNotNull"] },
+        "colorMode": "value"
+      },
+      "fieldConfig": {
+        "defaults": { "unit": "bytes" }
+      }
+    },
+
+    {
+      "id": 4,
+      "title": "Uptime système",
+      "type": "stat",
+      "gridPos": { "x": 18, "y": 0, "w": 6, "h": 4 },
+      "targets": [{
+        "expr": "time() - node_boot_time_seconds",
+        "legendFormat": "Uptime"
+      }],
+      "options": {
+        "reduceOptions": { "calcs": ["lastNotNull"] },
+        "colorMode": "value"
+      },
+      "fieldConfig": {
+        "defaults": { "unit": "dtdurations" }
+      }
+    },
+
+    {
+      "id": 5,
+      "title": "CPU — Utilisation par mode",
+      "type": "timeseries",
+      "gridPos": { "x": 0, "y": 4, "w": 12, "h": 8 },
+      "targets": [
+        {
+          "expr": "rate(node_cpu_seconds_total{mode=\"user\"}[5m]) * 100",
+          "legendFormat": "user"
+        },
+        {
+          "expr": "rate(node_cpu_seconds_total{mode=\"system\"}[5m]) * 100",
+          "legendFormat": "system"
+        },
+        {
+          "expr": "rate(node_cpu_seconds_total{mode=\"iowait\"}[5m]) * 100",
+          "legendFormat": "iowait"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": { "unit": "percent", "min": 0, "max": 100 }
+      }
+    },
+
+    {
+      "id": 6,
+      "title": "RAM — Détail (total / utilisée / disponible)",
+      "type": "timeseries",
+      "gridPos": { "x": 12, "y": 4, "w": 12, "h": 8 },
+      "targets": [
+        {
+          "expr": "node_memory_MemTotal_bytes",
+          "legendFormat": "Total"
+        },
+        {
+          "expr": "node_memory_MemTotal_bytes - node_memory_MemAvailable_bytes",
+          "legendFormat": "Utilisée"
+        },
+        {
+          "expr": "node_memory_MemAvailable_bytes",
+          "legendFormat": "Disponible"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": { "unit": "bytes" }
+      }
+    },
+
+    {
+      "id": 7,
+      "title": "Disque — Espace utilisé (%)",
+      "type": "bargauge",
+      "gridPos": { "x": 0, "y": 12, "w": 12, "h": 6 },
+      "targets": [{
+        "expr": "(1 - node_filesystem_avail_bytes{fstype!~\"tmpfs|overlay\",mountpoint!~\"/boot.*\"} / node_filesystem_size_bytes{fstype!~\"tmpfs|overlay\",mountpoint!~\"/boot.*\"}) * 100",
+        "legendFormat": "{{mountpoint}}"
+      }],
+      "options": {
+        "reduceOptions": { "calcs": ["lastNotNull"] },
+        "orientation": "horizontal",
+        "displayMode": "gradient"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percent",
+          "min": 0, "max": 100,
+          "thresholds": { "steps": [
+            { "value": null, "color": "green" },
+            { "value": 75,   "color": "yellow" },
+            { "value": 90,   "color": "red" }
+          ]}
+        }
+      }
+    },
+
+    {
+      "id": 8,
+      "title": "Réseau — Trafic entrant / sortant",
+      "type": "timeseries",
+      "gridPos": { "x": 12, "y": 12, "w": 12, "h": 6 },
+      "targets": [
+        {
+          "expr": "rate(node_network_receive_bytes_total{device!~\"lo|docker.*|veth.*\"}[5m])",
+          "legendFormat": "↓ entrant {{device}}"
+        },
+        {
+          "expr": "rate(node_network_transmit_bytes_total{device!~\"lo|docker.*|veth.*\"}[5m])",
+          "legendFormat": "↑ sortant {{device}}"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": { "unit": "Bps" }
+      }
+    },
+
+    {
+      "id": 9,
+      "title": "Charge système (load average)",
+      "type": "timeseries",
+      "gridPos": { "x": 0, "y": 18, "w": 12, "h": 6 },
+      "targets": [
+        {
+          "expr": "node_load1",
+          "legendFormat": "1 min"
+        },
+        {
+          "expr": "node_load5",
+          "legendFormat": "5 min"
+        },
+        {
+          "expr": "node_load15",
+          "legendFormat": "15 min"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": { "unit": "short" }
+      }
+    },
+
+    {
+      "id": 10,
+      "title": "Disque — I/O (lecture / écriture)",
+      "type": "timeseries",
+      "gridPos": { "x": 12, "y": 18, "w": 12, "h": 6 },
+      "targets": [
+        {
+          "expr": "rate(node_disk_read_bytes_total[5m])",
+          "legendFormat": "Lecture {{device}}"
+        },
+        {
+          "expr": "rate(node_disk_written_bytes_total[5m])",
+          "legendFormat": "Écriture {{device}}"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": { "unit": "Bps" }
+      }
+    }
+
+  ]
+}

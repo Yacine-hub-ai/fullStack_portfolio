@@ -1,0 +1,67 @@
+groups:
+
+  - name: portfolio.backend
+    rules:
+
+      - alert: BackendDown
+        expr: up{job="portfolio-backend"} == 0
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Backend Portfolio indisponible"
+          description: "L'API Express ne répond plus depuis plus d'1 minute."
+
+      - alert: HighErrorRate
+        expr: |
+          rate(http_requests_total{job="portfolio-backend",status=~"5.."}[5m])
+          /
+          rate(http_requests_total{job="portfolio-backend"}[5m]) > 0.05
+        for: 2m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Taux d'erreurs HTTP 5xx > 5%"
+
+      - alert: HighLatency
+        expr: |
+          histogram_quantile(0.99,
+            rate(http_request_duration_ms_bucket{job="portfolio-backend"}[5m])
+          ) > 500
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Latence P99 > 500ms"
+
+  - name: portfolio.infrastructure
+    rules:
+
+      - alert: HighCpuUsage
+        expr: |
+          100 - (avg by(instance) (rate(node_cpu_seconds_total{mode="idle"}[5m])) * 100) > 80
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "CPU > 80%"
+
+      - alert: HighMemoryUsage
+        expr: |
+          (1 - (node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes)) * 100 > 85
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "RAM > 85%"
+
+  - name: portfolio.mongodb
+    rules:
+
+      - alert: MongoDBDown
+        expr: up{job="mongodb"} == 0
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          summary: "MongoDB indisponible"

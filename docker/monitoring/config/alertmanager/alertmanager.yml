@@ -1,0 +1,33 @@
+global:
+  resolve_timeout: 5m
+
+route:
+  group_by: ['alertname', 'severity']
+  group_wait:      30s
+  group_interval:  5m
+  repeat_interval: 12h
+  receiver: 'email-portfolio'
+
+  routes:
+    - match:
+        severity: critical
+      receiver: 'email-portfolio'
+      group_wait: 10s
+      repeat_interval: 1h
+
+receivers:
+  - name: 'email-portfolio'
+    email_configs:
+      - to:      'nyacine183@gmail.com'
+        from:    'alertmanager@portfolio.local'
+        smarthost: 'smtp.gmail.com:587'
+        auth_username: 'nyacine183@gmail.com'
+        auth_password: '${SMTP_PASSWORD}'
+        send_resolved: true
+
+inhibit_rules:
+  - source_match:
+      alertname: BackendDown
+    target_match_re:
+      alertname: 'HighLatency|HighErrorRate'
+    equal: ['job']
