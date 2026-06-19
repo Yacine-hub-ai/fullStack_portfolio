@@ -132,43 +132,67 @@ pipeline {
                     string(credentialsId: 'mongo-root-password', variable: 'MONGO_ROOT_PASSWORD'),
                     string(credentialsId: 'mongo-db',            variable: 'MONGO_DB_NAME')
                 ]) {
-                    sh """
-                        # ── Vérifier que kubectl fonctionne ──
-                        echo "🔍 Vérification connexion Kubernetes..."
-                        kubectl get nodes
-                        echo "✅ Connexion Kubernetes OK"
+                    // ✅ Capturer les variables Groovy AVANT le bloc sh pour éviter
+                    //    l'interpolation Groovy des credentials dans le shell script
+                    script {
+                        def kubeconfig    = env.KUBECONFIG
+                        def workspace     = env.WORKSPACE
+                        def terraformDir  = env.TERRAFORM_DIR
+                        def kubeContext   = 'docker-desktop'
+                        def frontendImg   = "${env.DOCKERHUB_USER}/${env.FRONTEND_IMAGE}:${env.BUILD_NUMBER}-${env.GIT_SHORT}"
+                        def backendImg    = "${env.DOCKERHUB_USER}/${env.BACKEND_IMAGE}:${env.BUILD_NUMBER}-${env.GIT_SHORT}"
 
-                        # ── Initialiser Terraform ──
-                        cd ${WORKSPACE}/${TERRAFORM_DIR}
+                        sh '''
+                            # ── Vérifier que kubectl fonctionne ──
+                            echo "🔍 Vérification connexion Kubernetes..."
+                            kubectl get nodes
+                            echo "✅ Connexion Kubernetes OK"
+                        '''
 
-                        # ✅ TF_CLI_ARGS_init force le bon kubeconfig
-                        export KUBECONFIG=${KUBECONFIG}
+                        // ✅ Utiliser withEnv pour passer les valeurs sans interpolation Groovy
+                        //    Les credentials ($MONGO_ROOT_USER etc.) restent dans l'env shell
+                        //    et ne sont jamais interpolés par Groovy
+                        withEnv([
+                            "TF_KUBECONFIG=${kubeconfig}",
+                            "TF_WORKSPACE=${workspace}",
+                            "TF_DIR=${terraformDir}",
+                            "TF_KUBE_CONTEXT=${kubeContext}",
+                            "TF_FRONTEND_IMAGE=${frontendImg}",
+                            "TF_BACKEND_IMAGE=${backendImg}"
+                        ]) {
+                            sh '''
+                                # ── Initialiser Terraform ──
+                                export KUBECONFIG="$TF_KUBECONFIG"
+                                cd "$TF_WORKSPACE/$TF_DIR"
 
-                        terraform init -input=false -upgrade
+                                terraform init -input=false -upgrade
+                                terraform fmt -check || true
+                                terraform validate
 
-                        terraform fmt -check || true
-                        terraform validate
+                                # ── Supprimer le namespace si existant ──
+                                kubectl delete namespace portfolio --ignore-not-found=true
+                                if kubectl get namespace portfolio >/dev/null 2>&1; then
+                                    echo "⏳ Attente suppression namespace..."
+                                    kubectl wait --for=delete namespace/portfolio --timeout=180s
+                                fi
+                                echo "✅ Namespace prêt"
 
-                        # ── Supprimer le namespace si existant ──
-                        kubectl delete namespace portfolio --ignore-not-found=true
-                        if kubectl get namespace portfolio >/dev/null 2>&1; then
-                            echo "⏳ Attente suppression namespace..."
-                            kubectl wait --for=delete namespace/portfolio --timeout=180s
-                        fi
-                        echo "✅ Namespace prêt"
+                                # ── Appliquer le plan Terraform ──
+                                # ✅ Les variables sensibles ($MONGO_ROOT_USER etc.) sont lues
+                                #    depuis l'environnement shell — jamais interpolées par Groovy
+                                terraform apply -auto-approve \
+                                    -var="kubeconfig_path=$TF_KUBECONFIG" \
+                                    -var="kube_context=$TF_KUBE_CONTEXT" \
+                                    -var="frontend_image=$TF_FRONTEND_IMAGE" \
+                                    -var="backend_image=$TF_BACKEND_IMAGE" \
+                                    -var="mongo_root_user=$MONGO_ROOT_USER" \
+                                    -var="mongo_root_password=$MONGO_ROOT_PASSWORD" \
+                                    -var="mongo_database=$MONGO_DB_NAME"
 
-                        # ── Appliquer le plan Terraform ──
-                        terraform apply -auto-approve \\
-                            -var="kubeconfig_path=${KUBECONFIG}" \\
-                            -var="kube_context=minikube" \\
-                            -var="frontend_image=${DOCKERHUB_USER}/${FRONTEND_IMAGE}:${BUILD_NUMBER}-${GIT_SHORT}" \\
-                            -var="backend_image=${DOCKERHUB_USER}/${BACKEND_IMAGE}:${BUILD_NUMBER}-${GIT_SHORT}" \\
-                            -var="mongo_root_user=\$MONGO_ROOT_USER" \\
-                            -var="mongo_root_password=\$MONGO_ROOT_PASSWORD" \\
-                            -var="mongo_database=\$MONGO_DB_NAME"
-
-                        echo "✅ Terraform apply terminé"
-                    """
+                                echo "✅ Terraform apply terminé"
+                            '''
+                        }
+                    }
                 }
             }
         }

@@ -1,0 +1,46 @@
+global:
+  scrape_interval:     15s   # Fréquence de scraping par défaut
+  evaluation_interval: 15s   # Fréquence d'évaluation des règles d'alerte
+  external_labels:
+    environment: 'local'
+    project:     'portfolio'
+
+# ── Fichiers de règles d'alerte ───────────────────────────────
+rule_files:
+  - /etc/prometheus/alerts.yml
+
+# ── Configuration AlertManager ────────────────────────────────
+alerting:
+  alertmanagers:
+    - static_configs:
+        - targets: ['alertmanager:9093']
+
+# ── Targets à scraper ─────────────────────────────────────────
+scrape_configs:
+
+  # Prometheus lui-même
+  - job_name: 'prometheus'
+    static_configs:
+      - targets: ['localhost:9090']
+
+  # API Express Portfolio
+  - job_name: 'portfolio-backend'
+    static_configs:
+      - targets: ['backend:3001']
+    metrics_path: /metrics
+    scrape_interval: 10s
+
+  # Node Exporter (métriques système : CPU, RAM, disque)
+  - job_name: 'node-exporter'
+    static_configs:
+      - targets: ['node-exporter:9100']
+
+  # MongoDB Exporter
+  - job_name: 'mongodb'
+    static_configs:
+      - targets: ['mongodb-exporter:9216']
+
+  # cAdvisor (métriques conteneurs Docker)
+  - job_name: 'cadvisor'
+    static_configs:
+      - targets: ['cadvisor:8080']

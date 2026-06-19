@@ -6,6 +6,7 @@ import express from 'express'
 import cors from 'cors'
 import connectDB from './connectdb.js'
 import projetRoutes from './routes.js'
+import { createMetricsMiddleware, metricsHandler, register } from './metrics.js'
 
 await connectDB()
 
@@ -31,6 +32,9 @@ app.use(cors({
 app.use(express.json({ limit: '10mb' }))
 app.use(express.urlencoded({ extended: true, limit: '10mb' }))
 
+// ── Middleware de métriques HTTP (avant les routes) ────────────
+app.use(createMetricsMiddleware())
+
 app.get('/', (req, res) => {
   res.json({
     succes: true,
@@ -42,11 +46,15 @@ app.get('/', (req, res) => {
       'POST   /api/projets':     'Ajouter un projet',
       'PUT    /api/projets/:id': 'Modifier un projet',
       'DELETE /api/projets/:id': 'Supprimer un projet',
+      'GET    /metrics':         'Métriques Prometheus',
     },
   })
 })
 
 app.use('/api/projets', projetRoutes)
+
+// ── Endpoint Prometheus (/metrics) ────────────────────────────
+app.get('/metrics', metricsHandler)
 
 app.use((req, res) => {
   res.status(404).json({ succes: false, message: `Route non trouvée : ${req.method} ${req.originalUrl}` })
@@ -65,6 +73,7 @@ const PORT = process.env.PORT || 3001
 
 app.listen(PORT, '0.0.0.0', () => {
   console.log(`Serveur Express démarré sur le port ${PORT}`)
+  console.log(`Métriques Prometheus disponibles sur http://localhost:${PORT}/metrics`)
 })
 
 export default app

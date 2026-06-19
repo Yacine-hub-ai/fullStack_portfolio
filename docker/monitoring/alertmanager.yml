@@ -1,0 +1,41 @@
+global:
+  resolve_timeout: 5m
+
+# ── Routage des alertes ───────────────────────────────────────
+route:
+  group_by: ['alertname', 'severity']
+  group_wait:      30s    # Attendre 30s avant d'envoyer un groupe
+  group_interval:  5m     # Attendre 5m avant de renvoyer le même groupe
+  repeat_interval: 12h    # Répéter toutes les 12h si l'alerte persiste
+  receiver: 'email-portfolio'
+
+  routes:
+    # Alertes critiques → notification immédiate
+    - match:
+        severity: critical
+      receiver: 'email-portfolio'
+      group_wait: 10s
+      repeat_interval: 1h
+
+# ── Receivers ─────────────────────────────────────────────────
+receivers:
+  - name: 'email-portfolio'
+    email_configs:
+      - to:      'nyacine183@gmail.com'
+        from:    'alertmanager@portfolio.local'
+        # Remplacer par votre serveur SMTP
+        smarthost: 'smtp.gmail.com:587'
+        auth_username: 'nyacine183@gmail.com'
+        auth_password: '${SMTP_PASSWORD}'
+        send_resolved: true
+        headers:
+          subject: '[Portfolio] {{ .GroupLabels.alertname }} — {{ .Status | toUpper }}'
+
+# ── Inhibitions ───────────────────────────────────────────────
+inhibit_rules:
+  # Si le backend est down, inhiber les alertes de latence (redondant)
+  - source_match:
+      alertname: BackendDown
+    target_match_re:
+      alertname: 'HighLatency|HighErrorRate'
+    equal: ['job']
