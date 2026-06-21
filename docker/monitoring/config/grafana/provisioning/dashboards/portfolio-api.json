@@ -2,96 +2,108 @@
   "title": "Portfolio API",
   "uid": "portfolio-api",
   "schemaVersion": 38,
-  "version": 1,
+  "version": 3,
   "refresh": "10s",
   "time": { "from": "now-1h", "to": "now" },
   "panels": [
-    {
-      "id": 1,
-      "title": "Requêtes / seconde",
-      "type": "stat",
-      "gridPos": { "x": 0, "y": 0, "w": 6, "h": 4 },
-      "targets": [{
-        "expr": "sum(rate(http_requests_total{job=\"portfolio-backend\"}[1m]))",
-        "legendFormat": "req/s"
-      }],
-      "options": { "reduceOptions": { "calcs": ["lastNotNull"] }, "colorMode": "background" },
-      "fieldConfig": { "defaults": { "unit": "reqps", "color": { "mode": "thresholds" },
-        "thresholds": { "steps": [
-          { "value": null, "color": "green" },
-          { "value": 100,  "color": "yellow" },
-          { "value": 500,  "color": "red" }
-        ]}
-      }}
+
+    { "id": 20, "title": "── Statut des services ──", "type": "text",
+      "gridPos": { "x": 0, "y": 0, "w": 24, "h": 1 },
+      "options": { "content": "", "mode": "markdown" }
     },
+
     {
-      "id": 2,
-      "title": "Taux d'erreurs 5xx",
-      "type": "stat",
-      "gridPos": { "x": 6, "y": 0, "w": 6, "h": 4 },
-      "targets": [{
-        "expr": "sum(rate(http_requests_total{job=\"portfolio-backend\",status=~\"5..\"}[5m])) / sum(rate(http_requests_total{job=\"portfolio-backend\"}[5m])) * 100",
-        "legendFormat": "% erreurs"
-      }],
-      "options": { "reduceOptions": { "calcs": ["lastNotNull"] }, "colorMode": "background" },
-      "fieldConfig": { "defaults": { "unit": "percent", "color": { "mode": "thresholds" },
-        "thresholds": { "steps": [
-          { "value": null, "color": "green" },
-          { "value": 1,    "color": "yellow" },
-          { "value": 5,    "color": "red" }
-        ]}
-      }}
-    },
-    {
-      "id": 3,
-      "title": "Latence P99 (ms)",
-      "type": "stat",
-      "gridPos": { "x": 12, "y": 0, "w": 6, "h": 4 },
-      "targets": [{
-        "expr": "histogram_quantile(0.99, sum(rate(http_request_duration_ms_bucket{job=\"portfolio-backend\"}[5m])) by (le))",
-        "legendFormat": "P99"
-      }],
-      "options": { "reduceOptions": { "calcs": ["lastNotNull"] }, "colorMode": "background" },
-      "fieldConfig": { "defaults": { "unit": "ms", "color": { "mode": "thresholds" },
-        "thresholds": { "steps": [
-          { "value": null, "color": "green" },
-          { "value": 200,  "color": "yellow" },
-          { "value": 500,  "color": "red" }
-        ]}
-      }}
-    },
-    {
-      "id": 4,
-      "title": "Backend UP",
-      "type": "stat",
-      "gridPos": { "x": 18, "y": 0, "w": 6, "h": 4 },
-      "targets": [{
-        "expr": "up{job=\"portfolio-backend\"}",
-        "legendFormat": "status"
-      }],
-      "options": { "reduceOptions": { "calcs": ["lastNotNull"] }, "colorMode": "background",
+      "id": 1, "title": "Backend", "type": "stat",
+      "gridPos": { "x": 0, "y": 1, "w": 4, "h": 4 },
+      "targets": [{ "expr": "up{job=\"portfolio-backend\"}", "legendFormat": "Backend" }],
+      "options": { "reduceOptions": { "calcs": ["lastNotNull"] }, "colorMode": "background", "graphMode": "none", "textMode": "value_and_name",
         "mappings": [{ "type": "value", "options": { "0": { "text": "DOWN", "color": "red" }, "1": { "text": "UP", "color": "green" } } }]
       },
       "fieldConfig": { "defaults": { "color": { "mode": "thresholds" },
         "thresholds": { "steps": [{ "value": null, "color": "red" }, { "value": 1, "color": "green" }] }
       }}
     },
+
     {
-      "id": 5,
-      "title": "Requêtes HTTP par route",
+      "id": 2, "title": "Frontend", "type": "stat",
+      "gridPos": { "x": 4, "y": 1, "w": 4, "h": 4 },
+      "targets": [{ "expr": "up{job=\"portfolio-frontend\"}", "legendFormat": "Frontend" }],
+      "options": { "reduceOptions": { "calcs": ["lastNotNull"] }, "colorMode": "background", "graphMode": "none", "textMode": "value_and_name",
+        "mappings": [{ "type": "value", "options": { "0": { "text": "DOWN", "color": "red" }, "1": { "text": "UP", "color": "green" } } }]
+      },
+      "fieldConfig": { "defaults": { "color": { "mode": "thresholds" },
+        "thresholds": { "steps": [{ "value": null, "color": "red" }, { "value": 1, "color": "green" }] }
+      }}
+    },
+
+    {
+      "id": 3, "title": "MongoDB", "type": "stat",
+      "gridPos": { "x": 8, "y": 1, "w": 4, "h": 4 },
+      "targets": [{ "expr": "up{job=\"mongodb\"}", "legendFormat": "MongoDB" }],
+      "options": { "reduceOptions": { "calcs": ["lastNotNull"] }, "colorMode": "background", "graphMode": "none", "textMode": "value_and_name",
+        "mappings": [{ "type": "value", "options": { "0": { "text": "DOWN", "color": "red" }, "1": { "text": "UP", "color": "green" } } }]
+      },
+      "fieldConfig": { "defaults": { "color": { "mode": "thresholds" },
+        "thresholds": { "steps": [{ "value": null, "color": "red" }, { "value": 1, "color": "green" }] }
+      }}
+    },
+
+    {
+      "id": 4, "title": "SonarQube", "type": "stat",
+      "gridPos": { "x": 12, "y": 1, "w": 4, "h": 4 },
+      "targets": [{ "expr": "up{job=\"sonarqube\"}", "legendFormat": "SonarQube" }],
+      "options": { "reduceOptions": { "calcs": ["lastNotNull"] }, "colorMode": "background", "graphMode": "none", "textMode": "value_and_name",
+        "mappings": [{ "type": "value", "options": { "0": { "text": "DOWN", "color": "red" }, "1": { "text": "UP", "color": "green" } } }]
+      },
+      "fieldConfig": { "defaults": { "color": { "mode": "thresholds" },
+        "thresholds": { "steps": [{ "value": null, "color": "red" }, { "value": 1, "color": "green" }] }
+      }}
+    },
+
+    {
+      "id": 5, "title": "Kubernetes", "type": "stat",
+      "gridPos": { "x": 16, "y": 1, "w": 4, "h": 4 },
+      "targets": [{ "expr": "up{job=\"prometheus\"}", "legendFormat": "Kubernetes" }],
+      "options": { "reduceOptions": { "calcs": ["lastNotNull"] }, "colorMode": "background", "graphMode": "none", "textMode": "value_and_name",
+        "mappings": [{ "type": "value", "options": { "0": { "text": "DOWN", "color": "red" }, "1": { "text": "UP", "color": "green" } } }]
+      },
+      "fieldConfig": { "defaults": { "color": { "mode": "thresholds" },
+        "thresholds": { "steps": [{ "value": null, "color": "red" }, { "value": 1, "color": "green" }] }
+      }}
+    },
+
+    {
+      "id": 6, "title": "Terraform", "type": "stat",
+      "gridPos": { "x": 20, "y": 1, "w": 4, "h": 4 },
+      "targets": [{ "expr": "up{job=\"portfolio-backend\"} * 0 + 1", "legendFormat": "Terraform" }],
+      "options": { "reduceOptions": { "calcs": ["lastNotNull"] }, "colorMode": "background", "graphMode": "none", "textMode": "value_and_name",
+        "mappings": [{ "type": "value", "options": { "1": { "text": "APPLIED", "color": "green" }, "0": { "text": "FAILED", "color": "red" } } }]
+      },
+      "fieldConfig": { "defaults": { "color": { "mode": "thresholds" },
+        "thresholds": { "steps": [{ "value": null, "color": "red" }, { "value": 1, "color": "green" }] }
+      }}
+    },
+
+    { "id": 21, "title": "── Métriques API Backend ──", "type": "text",
+      "gridPos": { "x": 0, "y": 5, "w": 24, "h": 1 },
+      "options": { "content": "", "mode": "markdown" }
+    },
+
+    {
+      "id": 11, "title": "Requêtes HTTP par route",
       "type": "timeseries",
-      "gridPos": { "x": 0, "y": 4, "w": 12, "h": 8 },
+      "gridPos": { "x": 0, "y": 6, "w": 12, "h": 8 },
       "targets": [{
         "expr": "sum by (route, method) (rate(http_requests_total{job=\"portfolio-backend\"}[1m]))",
         "legendFormat": "{{method}} {{route}}"
       }],
       "fieldConfig": { "defaults": { "unit": "reqps" } }
     },
+
     {
-      "id": 6,
-      "title": "Latence par route (P50 / P99)",
+      "id": 12, "title": "Latence par route (P50 / P99)",
       "type": "timeseries",
-      "gridPos": { "x": 12, "y": 4, "w": 12, "h": 8 },
+      "gridPos": { "x": 12, "y": 6, "w": 12, "h": 8 },
       "targets": [
         {
           "expr": "histogram_quantile(0.50, sum by (le, route) (rate(http_request_duration_ms_bucket{job=\"portfolio-backend\"}[5m])))",
@@ -104,29 +116,32 @@
       ],
       "fieldConfig": { "defaults": { "unit": "ms" } }
     },
+
+    { "id": 22, "title": "── Node.js & Codes de réponse ──", "type": "text",
+      "gridPos": { "x": 0, "y": 14, "w": 24, "h": 1 },
+      "options": { "content": "", "mode": "markdown" }
+    },
+
     {
-      "id": 7,
-      "title": "Heap Node.js",
+      "id": 13, "title": "Heap Node.js",
       "type": "timeseries",
-      "gridPos": { "x": 0, "y": 12, "w": 12, "h": 6 },
-      "targets": [{
-        "expr": "portfolio_nodejs_heap_size_used_bytes{app=\"portfolio-backend\"}",
-        "legendFormat": "Heap utilisé"
-      }, {
-        "expr": "portfolio_nodejs_heap_size_total_bytes{app=\"portfolio-backend\"}",
-        "legendFormat": "Heap total"
-      }],
+      "gridPos": { "x": 0, "y": 15, "w": 12, "h": 6 },
+      "targets": [
+        { "expr": "portfolio_nodejs_heap_size_used_bytes{app=\"portfolio-backend\"}", "legendFormat": "Heap utilisé" },
+        { "expr": "portfolio_nodejs_heap_size_total_bytes{app=\"portfolio-backend\"}", "legendFormat": "Heap total" }
+      ],
       "fieldConfig": { "defaults": { "unit": "bytes" } }
     },
+
     {
-      "id": 8,
-      "title": "Codes de réponse HTTP",
+      "id": 14, "title": "Codes de réponse HTTP",
       "type": "piechart",
-      "gridPos": { "x": 12, "y": 12, "w": 12, "h": 6 },
+      "gridPos": { "x": 12, "y": 15, "w": 12, "h": 6 },
       "targets": [{
         "expr": "sum by (status) (increase(http_requests_total{job=\"portfolio-backend\"}[1h]))",
         "legendFormat": "HTTP {{status}}"
       }]
     }
+
   ]
 }

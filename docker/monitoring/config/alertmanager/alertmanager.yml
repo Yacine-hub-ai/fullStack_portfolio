@@ -19,11 +19,14 @@ receivers:
   - name: 'email-portfolio'
     email_configs:
       - to:      'nyacine183@gmail.com'
-        from:    'alertmanager@portfolio.local'
+        from:    'nyacine183@gmail.com'
         smarthost: 'smtp.gmail.com:587'
         auth_username: 'nyacine183@gmail.com'
-        auth_password: '${SMTP_PASSWORD}'
+        auth_password: 'flihdcpzdrcdawzs'
+        require_tls: true
         send_resolved: true
+        headers:
+          subject: '[Portfolio] {{ .GroupLabels.alertname }} — {{ .Status | toUpper }}'
 
 inhibit_rules:
   - source_match:

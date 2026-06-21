@@ -6,6 +6,8 @@ docker/jenkins/secrets/
 
 # Docker
 docker/.env
+docker/monitoring/.env
+docker/monitoring/config/alertmanager/alertmanager.yml
 **/node_modules/
 
 # Terraform

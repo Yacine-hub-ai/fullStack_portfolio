@@ -33,11 +33,8 @@ services:
     ports:
       - "9093:9093"
     volumes:
-      # ✅ Idem : dossier entier
       - ./config/alertmanager:/etc/alertmanager:ro
       - alertmanager_data:/alertmanager
-    environment:
-      - SMTP_PASSWORD=${SMTP_PASSWORD:-changeme}
     networks:
       - monitoring-net
 
